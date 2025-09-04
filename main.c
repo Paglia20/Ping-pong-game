@@ -14,13 +14,14 @@
 #include "bit_macros.h"
 #include "UART.h"
 
+#define FOSC 1843200
 
 void exercise1(void) {
-
+	UART_init(FOSC);
 	//UART
 	put_char(get_char() + 1);		
 
-	printf("\nhello world!\n");
+	printf("h");
 
 }
 
