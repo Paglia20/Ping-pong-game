@@ -1,49 +1,31 @@
-/*
- * UART.c
- *
- * Created: 03.09.2016 16:32:20
-  *  Author: Paglia20
-
- */
-
-// UART = Universal Asynchronous Receiver/Transmitter
-
-#include <stdio.h>
 #include <avr/io.h>
-#include "bit_macros.h"
 #include "UART.h"
 
-#define BAUD 9600 //Baud rate = symbols pr second.
+void UART_init(uint32_t clock_hz, uint32_t baud) {
+    uint16_t ubrr = (uint16_t)(clock_hz / (16UL * baud) - 1UL);
 
-void UART_init(unsigned long clock_speed){
+    UBRR0H = (uint8_t)(ubrr >> 8);
+    UBRR0L = (uint8_t)(ubrr);
 
-	unsigned long baud = BAUD;
-	unsigned char ubrr = (clock_speed / (baud * 16)) - 1;	
-	
-	/* Set baud rate */
-	UBRR0H = ubrr >> 8;			
-	UBRR0L = ubrr;				
-	
-	/* Set frame format: 8data, 2stop bit */
-	UCSR0C = (1<<URSEL0)|(1<<USBS0);		// USBS: 1 = Use 2 stop bits, not 1												
-	UCSR0C = (1<<URSEL0)|(3<<UCSZ00);		// UCSZ00: 3 - UCSZ0 and UCSZ1 defines 8 bits (11 binary) for each character	
-	
-	/* Enable receiver and transmitter */
-	set_bit(UCSR0B,RXEN0);		//RXEN enables the receiver.
-	set_bit(UCSR0B,TXEN0);		//TXEN enables the transmitter.
-	
-	fdevopen(put_char, get_char);
-	
+    UCSR0A = 0;                                // normal speed
+    UCSR0B = (1 << RXEN0) | (1 << TXEN0);      // enable RX, TX
+    UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);    // 8 data, 1 stop, no parity (8N1)
 }
 
-int put_char(unsigned char c){
-	loop_until_bit_is_set(UCSR0A, UDRE0);
-	UDR0 = c;
-	return 0;
+void uart_putc(char c) {
+    while (!(UCSR0A & (1 << UDRE0))) { }
+    UDR0 = c;
 }
 
-int get_char(void){
-	loop_until_bit_is_set(UCSR0A, RXC0);
+void uart_puts(const char *s) {
+    while (*s) uart_putc(*s++);
+}
 
-	return UDR0;
+int uart_available(void) {
+    return (UCSR0A & (1 << RXC0)) != 0;
+}
+
+char uart_getc(void) {
+    while (!uart_available()) { }
+    return UDR0;
 }

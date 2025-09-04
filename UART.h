@@ -1,16 +1,8 @@
-/*
- * UART.h
- *
- * Created: 03.09.2016 16:32:57
- *  Author: Paglia20
- */ 
+#pragma once
+#include <stdint.h>
 
-
-#ifndef UART_H_
-#define UART_H_
-
-void UART_init(unsigned long clock_speed);
-int put_char(unsigned char c);
-int get_char(void);
-
-#endif
+void UART_init(uint32_t clock_hz, uint32_t baud);
+void uart_putc(char c);
+void uart_puts(const char *s);
+int  uart_available(void);
+char uart_getc(void);  // blocking

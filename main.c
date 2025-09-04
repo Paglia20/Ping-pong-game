@@ -1,36 +1,38 @@
 /*
  * GccApplication1.c
- *
- * Created: 02.09.2025 14:20:17
- *  Author: Paglia20
- */ 
+ * Created: 02.09.2025
+ * Author: Paglia20
+ */
 
-#define F_CPU 4915200UL
-
+#define F_CPU 4915200UL   // <-- MUST match your real clock!
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "bit_macros.h"
 #include "UART.h"
 
-#define FOSC 1843200
+// Hook stdio to UART
+static int uart_putchar(char c, FILE *stream) { uart_putc(c); return 0; }
+static int uart_getchar(FILE *stream) { return uart_getc(); }
+static FILE uart_stdio = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
-void exercise1(void) {
-	UART_init(FOSC);
-	//UART
-	put_char(get_char() + 1);		
-
-	printf("h");
-
+static void exercise1(void) {
+    // read one byte if available, send back the next ASCII (A->B, '0'->'1', etc.)
+    if (uart_available()) {
+        char c = uart_getc();
+        uart_putc(c + 1);
+    }
 }
 
-int main(void)
-{
-   DDRA |= (1 << DDA5);
-   while (1)
-   {
-	   exercise1();
-	   _delay_ms(1000);
-   }
+int main(void) {
+    UART_init(F_CPU, 9600);    // 9600 8N1
+    stdout = &uart_stdio;
+    stdin  = &uart_stdio;
+
+    printf("printf is working!\r\n");
+
+    for (;;) {
+        exercise1();
+        _delay_ms(10);
+    }
 }
