@@ -2,7 +2,7 @@
  * bit_macros.h
  *
  * Created: 03.09.2016 13:56:13
- *  Author: Whiskey dicks
+ *  Author: Paglia20
  */ 
 
 

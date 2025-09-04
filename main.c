@@ -2,7 +2,7 @@
  * GccApplication1.c
  *
  * Created: 02.09.2025 14:20:17
- * Author : muhammao
+ *  Author: Paglia20
  */ 
 
 #define F_CPU 4915200UL
@@ -12,14 +12,13 @@
 #include <stdio.h>
 
 #include "bit_macros.h"
-#include "UART_driver.h"
+#include "UART.h"
 
 
 void exercise1(void) {
 
 	//UART
-
-	put_char(get_char() + 1);		//Returns the character next in the alphabet.
+	put_char(get_char() + 1);		
 
 	printf("\nhello world!\n");
 
