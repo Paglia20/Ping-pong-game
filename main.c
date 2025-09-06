@@ -4,7 +4,7 @@
  * Author: Paglia20
  */
 
-#define F_CPU 4915200UL   // <-- MUST match your real clock!
+#define F_CPU 4915200UL  // 4.9152 MHz
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
@@ -14,6 +14,9 @@
 // Hook stdio to UART
 static int uart_putchar(char c, FILE *stream) { uart_putc(c); return 0; }
 static int uart_getchar(FILE *stream) { return uart_getc(); }
+
+//FDEV_SETUP_STREAM sets up a FILE stream to use custom input/output functions (e.g., UART) for stdin and stdout.
+// its like fdevopen but for AVR
 static FILE uart_stdio = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
 static void exercise1(void) {
@@ -29,7 +32,7 @@ int main(void) {
     stdout = &uart_stdio;
     stdin  = &uart_stdio;
 
-    printf("printf is working!\r\n");
+    printf("printf is working?\r\n");
 
     for (;;) {
         exercise1();
