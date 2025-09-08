@@ -5,6 +5,8 @@
  */
 
 #define F_CPU 4915200UL  // 4.9152 MHz
+#define BAUD 9600
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdio.h>
@@ -28,7 +30,21 @@ static void exercise1(void) {
 }
 
 int main(void) {
-    UART_init(F_CPU, 9600);    // 9600 8N1
+
+    DDRB |= (1 << PB0);
+    for (uint16_t i = 0; i < 50; i++)
+    {
+        PORTB ^= (1 << PB0);
+        _delay_ms(500);
+    }
+    PORTB &= ~(1 << PB0);
+
+    _delay_ms(50);
+
+    printf("22printf is working?\r\n");
+
+    
+    UART_init(F_CPU, BAUD);    // 9600 8N1
     stdout = &uart_stdio;
     stdin  = &uart_stdio;
 

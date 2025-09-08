@@ -29,7 +29,7 @@ void UART_init(uint32_t clock_hz, uint32_t baud) {
 
 
     //if we want 2 stop bits:
-    //UCSR0C = (1 << URSEL0) | (1 << UCSZ01) | (1 << UCSZ00) | (1 << USBS0);
+    //UCSR0C = (1 << URSEL0) | (1 << UCSZ01)|  (1 << UCSZ00) | (1 << USBS0);
 
 
     //UCSZ01 = channel-specific bit for USART0
