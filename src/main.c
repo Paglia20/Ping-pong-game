@@ -11,7 +11,7 @@
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "UART.h"
+#include "../include/UART.h">
 
 // Hook stdio to UART
 static int uart_putchar(char c, FILE *stream) { uart_putc(c); return 0; }
@@ -50,7 +50,7 @@ int main(void) {
 
     printf("printf is working?\r\n");
 
-    for (;;) {
+    while (1) {
         exercise1();
         _delay_ms(10);
     }

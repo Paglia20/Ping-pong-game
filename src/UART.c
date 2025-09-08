@@ -1,6 +1,8 @@
 #include <avr/io.h>
-#include "UART.h"
 #include <stddef.h>  
+
+#include "../include/UART.h">
+
 
 void UART_init(uint32_t clock_hz, uint32_t baud) {
     uint16_t ubrr = (uint16_t)(clock_hz / (16UL * baud) - 1UL);
