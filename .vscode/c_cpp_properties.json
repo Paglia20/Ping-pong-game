@@ -4,15 +4,17 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/opt/avr-gcc@9/avr/include" // Path to AVR include files
+                "/usr/lib/gcc/avr/7.3.0/include",
+                "/usr/lib/avr/include"
             ],
             "defines": [
-                "__AVR_ATmega162__" // Define the ATmega162 microcontroller
+                "__AVR_ATmega162__" 
             ],
-            "compilerPath": "/usr/local/bin/avr-gcc", // Path to your AVR GCC compiler
+            "compilerPath": "/usr/bin/avr-gcc", 
+            "compilerArgs": ["-mmcu=atmega162"],
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "gcc-x64"   // Use gcc-x64 for AVR
+            "intelliSenseMode": "gcc-x64"   
         }
     ],
     "version": 4
