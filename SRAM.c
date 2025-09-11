@@ -76,7 +76,7 @@ void SRAM_test(void)
 }
 
 
-/* void SRAM_test_with_wrappers(void) 
+void SRAM_test_with_wrappers(void) 
 {
     uint16_t ext_ram_size = 0x800;   // 0x1800..0x1FFF
     uint16_t write_errors = 0;
@@ -128,4 +128,4 @@ void SRAM_test(void)
            "\n%4u wrapper API errors\n\n",
            write_errors, retrieval_errors, api_errors);
 }
- */
+// End of SRAM.c

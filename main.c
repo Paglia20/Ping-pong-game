@@ -73,11 +73,11 @@ int main(void) {
     //TEST SRAM
     XMEM_init();
 
-   /*  dec_test();
+    /*  dec_test();
 
-    SRAM_test(); */
-  
+   SRAM_test(); 
+    SRAM_test_with_wrappers(); */
 
-    
+
 }
 
