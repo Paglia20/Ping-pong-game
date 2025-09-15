@@ -7,6 +7,7 @@
 
 
 #define FIRST_ADDRESS 0x1800
+volatile char *ext_ram = (char *) FIRST_ADDRESS; 
 
 
 void XMEM_init(void){
@@ -17,7 +18,6 @@ void XMEM_init(void){
 
 
 int SRAM_write(uint16_t address, char data){
-    volatile char* ext_ram = (volatile char*) FIRST_ADDRESS;	
 	if (address <= 0x7FF){
         ext_ram[address] = data;
         return 0;
@@ -27,8 +27,7 @@ int SRAM_write(uint16_t address, char data){
 	return EXIT_FAILURE;
 }
 
-char SRAM_read(uint16_t address){
-    volatile char* ext_ram = (volatile char*) FIRST_ADDRESS;	
+uint8_t SRAM_read(uint16_t address){
     if (address <= 0x7FF){
         return ext_ram[address];
     }
@@ -39,7 +38,6 @@ char SRAM_read(uint16_t address){
 
 void SRAM_test(void)
 {
-    volatile char *ext_ram = (char *) 0x1800; // Start address for the SRAM
     uint16_t ext_ram_size = 0x800;
     uint16_t write_errors = 0;
     uint16_t retrieval_errors = 0;

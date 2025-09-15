@@ -57,6 +57,39 @@ void test_uart(void) {
     } 
 }
 
+void test_adc(void) {
+    adc_init();
+
+    printf("ADC test start\r\n");
+
+    while (1) {
+        uint8_t *values = adc_read();  // CH0..CH3
+
+        printf("CH0=%3u  CH1=%3u  CH2=%3u  CH3=%3u\r\n",
+               values[0], values[1], values[2], values[3]);
+
+        _delay_ms(200);
+    }
+}
+
+void test_joystick(void) {
+    init_button();
+    adc_init();
+    calibrate();
+
+    printf("Joystick test start\r\n");
+
+    while (1) {
+        // Update joystick position and direction
+        
+        print_joystick();
+        _delay_ms(50);
+    }
+}
+
+
+
+
 int main(void) {
     fflush(stdout);
 
@@ -75,9 +108,12 @@ int main(void) {
 
     /*  dec_test();
 
-   SRAM_test(); 
+    SRAM_test(); 
     SRAM_test_with_wrappers(); */
 
+
+    // Test ADC
+    //test_adc();
 
 }
 

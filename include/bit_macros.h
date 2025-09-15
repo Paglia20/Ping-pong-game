@@ -16,5 +16,6 @@
 #define loop_until_bit_is_clear( reg, bit ) while( test_bit( reg, bit ) )
 
 #define toggle_bit(reg, bit) (reg ^= (1 << bit))
+#define bitIsSet(reg, bit) (reg & (1<<bit))
 
 #endif /* BIT_MACROS_H_ */
