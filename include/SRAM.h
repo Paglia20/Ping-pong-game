@@ -8,7 +8,7 @@ void XMEM_init(void);
 
 int SRAM_write(uint16_t address, char data);
 
-char SRAM_read(uint16_t address);
+uint8_t SRAM_read(uint16_t address);
 
 void SRAM_test(void);
 

@@ -14,6 +14,9 @@
 #include "include/UART.h"
 #include "include/SRAM.h"
 #include "include/decoder.h"
+#include "include/ADC.h"
+#include "include/joystick.h"
+
 
 
 void pulse_ALE(void) {
@@ -58,7 +61,6 @@ void test_uart(void) {
 }
 
 void test_adc(void) {
-    adc_init();
 
     printf("ADC test start\r\n");
 
@@ -113,7 +115,9 @@ int main(void) {
 
 
     // Test ADC
-    //test_adc();
+    adc_init();
+
+    test_adc();
 
 }
 

@@ -5,6 +5,8 @@
 #include "include/UART.h"
 #include "include/SRAM.h"
 #include "include/decoder.h"
+#include "include/bit_macros.h"
+
 
 
 #define adc_address 0x1000
@@ -24,21 +26,21 @@ static uint8_t adcData[num_channels];
 void adc_init (void){
 
     // clock initialization on OC1A pin (PD5)
-    setBit(DDRD, PD5);
+    set_bit(DDRD, PD5);
 
     // (COM1A1:0 = 01) : setting OC1A to toggle on compare match 
-    clearBit(TCCR1A, COM1A1);
-    setBit(TCCR1A,   COM1A0);
+    clear_bit(TCCR1A, COM1A1);
+    set_bit(TCCR1A,   COM1A0);
 
     // Put Timer1 in CTC mode with TOP = OCR1A (WGM13:0 = 0100)
     /*
     With WGM12=1 and the rest 0, CTC (Clear Timer on Compare Match) is selected and OCR1A becomes TOP. 
     The timer resets to 0 on each match.
     */
-    clearBit(TCCR1B, WGM13);
-    setBit( TCCR1B, WGM12);
-    clearBit(TCCR1A, WGM11);
-    clearBit(TCCR1A, WGM10);
+    clear_bit(TCCR1B, WGM13);
+    set_bit( TCCR1B, WGM12);
+    clear_bit(TCCR1A, WGM11);
+    clear_bit(TCCR1A, WGM10);
 
 
     //Set compare value OCR1A = 0, so the timer matches at count 0 and "toggle on compare"
@@ -48,13 +50,13 @@ void adc_init (void){
     OCR1AL = 0x00;
 
     //(CS12:10 = 001) : // prescaler 1
-    clearBit(TCCR1B, CS12);
-    clearBit(TCCR1B, CS11);
-    setBit( TCCR1B, CS10);
+    clear_bit(TCCR1B, CS12);
+    clear_bit(TCCR1B, CS11);
+    set_bit( TCCR1B, CS10);
 
 
     // PD4 = BUSY input
-    clearBit(DDRD, PD4);
+    clear_bit(DDRD, PD4);
 
 }
 
