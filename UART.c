@@ -18,6 +18,7 @@ static int uart_getchar(FILE *stream) {
 }
 
 void UART_init(uint32_t clock_hz, uint32_t baud) {
+    
     uint16_t ubrr = (uint16_t)(clock_hz / (16UL * baud) - 1UL);
 
     //UBRR0 sets the baud rate for UART communication. The value written to UBRR0H and UBRR0L determines the speed of data transmission

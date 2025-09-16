@@ -93,31 +93,28 @@ void test_joystick(void) {
 
 
 int main(void) {
-    fflush(stdout);
-
+   // fflush(stdout);
     UART_init(F_CPU, BAUD);    // 9600 8N1
 
-
-    // Test UART
-    //test_uart();
+    test_uart();
 
 
     //TEST D LATCH
     //test_dlatch();
 
     //TEST SRAM
-    XMEM_init();
+    // XMEM_init();
 
-    /*  dec_test();
+    // dec_test();
 
-    SRAM_test(); 
-    SRAM_test_with_wrappers(); */
+    // SRAM_test(); 
 
 
-    // Test ADC
-    adc_init();
 
-    test_adc();
+    // // Test ADC
+    // adc_init();
+
+    //test_adc();
 
 }
 
