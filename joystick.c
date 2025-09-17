@@ -2,7 +2,8 @@
 #include <util/delay.h>
 #include <stdio.h>
 #include <stdbool.h>
- #include <stdlib.h>
+#include <stdlib.h>
+#include <avr/pgmspace.h>
 
 #include "include/ADC.h"
 #include "include/UART.h"
@@ -17,26 +18,27 @@ static inline int16_t percent_axis(uint8_t val, uint8_t zero);
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc);
 
 // Defines PD2 and PD3 as input Buttons
-volatile void init_button(void) {
+void init_button(void) {
 	clear_bit(DDRD,PD2); 
 	clear_bit(DDRD,PD3);
 }
 
-/* volatile void print_joystick(void) { 
-	printf("X: (%4d%%) | Y: (%4d%%) | Dir: %s\r\n", 
+//for some reasons these two functions need to use printf_P to work properly
+void print_joystick(void) { 
+	printf_P(PSTR("X: %d (%d) | Y: %d (%d) | Dir: %s\r\n"), pos.x_val, pos.y_val,
         pos.x_val_perc, pos.y_val_perc, 
         (pos.dir == UP) ? "UP   " : (pos.dir == DOWN) ? "DOWN " : (pos.dir == LEFT) ? "LEFT " : (pos.dir == RIGHT) ? "RIGHT" : "NEUTRAL");
-} */
+} 
 
-/* void print_zeros(void) { 
-	printf("X0: (%d) | Y0: (%d)\r\n", 
+void print_zeros(void) { 
+	printf_P(PSTR("X0: (%d) | Y0: (%d)\r\n"), 
         pos.x_zero, pos.y_zero); 
-} */
+} 
 
-volatile void calibrate(void) {
+void calibrate(void) {
 	uint8_t *data;
 	data = adc_read();
-	
+
 	pos.x_zero = *data;
 	pos.y_zero = *(data+1);
 }
@@ -56,23 +58,21 @@ static inline int16_t percent_axis(uint8_t val, uint8_t zero) {
 
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc) {
     // manual abs to avoid any signed/width surprises
-    int16_t ay = (y_perc >= 0) ? y_perc : (int16_t)(-y_perc);
+/*     int16_t ay = (y_perc >= 0) ? y_perc : (int16_t)(-y_perc);
     if (x_perc >  DEADZONE && x_perc >= ay) return RIGHT;
     if (x_perc < -DEADZONE && -x_perc >= ay) return LEFT;
     if (y_perc >  DEADZONE) return UP;
-    if (y_perc < -DEADZONE) return DOWN;
+    if (y_perc < -DEADZONE) return DOWN; */
     return NEUTRAL;
 }
 
-// Update joystick position and direction che richiama:
+// Update joystick position and direction
+void update_position(void){
+    uint8_t *data = adc_read();
 
-volatile void update_position(void){
-    uint8_t *data;
-	data = adc_read();
-    
     uint8_t x, y;
-    x = *data;
-    y = *(data+1);
+    x = data[0];
+    y = data[1];
 	pos.x_val = x;
     pos.y_val = y;
     pos.x_val_perc  = percent_axis(x, pos.x_zero);
@@ -80,5 +80,7 @@ volatile void update_position(void){
 
     pos.dir = dir_from_xy(pos.x_val_perc, pos.y_val_perc);
 
+	printf_P(PSTR("updated position\r\n"));
+	print_joystick();
 }
 

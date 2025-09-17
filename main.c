@@ -74,7 +74,7 @@ void test_adc(void) {
     }
 }
 
-/* void test_joystick(void) {
+void test_joystick(void) {
     //init_button();
     adc_init();
     calibrate();
@@ -83,15 +83,15 @@ void test_adc(void) {
 
     print_zeros();
 
-    while (1) {
-        update_position();
-        print_joystick();
-        _delay_ms(50);
-    }
-} */
+    update_position();
+    print_joystick();
+    _delay_ms(200);
+} 
 
 
 int main(void) {
+    fflush(stdout);
+
    // INITS
     UART_init(F_CPU, BAUD);    // 9600 8N1
     XMEM_init();
@@ -104,7 +104,7 @@ int main(void) {
 
     //TEST SRAM
 
-    dec_test();
+    //dec_test();
 
     // SRAM_test(); 
 
@@ -113,7 +113,7 @@ int main(void) {
     // // Test ADC
     adc_init();
 
-    test_adc();
-
+    //test_adc();
+    test_joystick();
 }
 
