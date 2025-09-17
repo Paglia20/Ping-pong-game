@@ -16,8 +16,13 @@
 #include "include/decoder.h"
 #include "include/ADC.h"
 #include "include/joystick.h"
+#include "include/slider.h"
+#include "include/bit_macros.h"
 
-
+//for part 4 Defines PD2 Buttons
+void init_button(void) {
+	clear_bit(DDRD,PD2); 
+}
 
 void pulse_ALE(void) {
     // Genera un impulso basso-alto-basso su PE1 per latchare i dati
@@ -67,15 +72,14 @@ void test_adc(void) {
     while (1) {
         uint8_t *values = adc_read();  // CH0..CH3
 
-        printf("X =%3u  Y =%3u  CH2 (/) =%3u  CH3 (/) =%3u\r\n",
-               values[0], values[1], 0, 0);
+        printf("X =%3u  Y =%3u  SLIDER =%3u  CH3 (/) =%3u\r\n",
+               values[0], values[1], values[2], 0);
 
         _delay_ms(200);
     }
 }
 
 void test_joystick(void) {
-    //init_button();
     calibrate();
 
     printf("Joystick test start\r\n");
@@ -89,6 +93,19 @@ void test_joystick(void) {
     }
 } 
 
+void test_slider(void) {
+    calibrate_slider();
+
+    printf("Slider test start\r\n");
+
+    print_slider_zeros();
+
+    while (1) {
+        update_slider();
+        print_slider();
+        _delay_ms(200);
+    }
+} 
 
 int main(void) {
     fflush(stdout);
@@ -115,6 +132,7 @@ int main(void) {
     adc_init();
 
     //test_adc();
-    test_joystick();
+    //test_joystick();
+    test_slider();
 }
 

@@ -10,7 +10,7 @@
 
 
 #define adc_address 0x1000
-#define num_channels 4
+#define num_channels 3
 
 //ADC storage
 static volatile uint8_t * const adcVal = (uint8_t *)adc_address;
@@ -49,7 +49,7 @@ void adc_init (void){
     OCR1AH = 0x00;
     OCR1AL = 0x00;
 
-    //(CS12:10 = 001) : // prescaler 1
+    //(CS12:10 = 001) : // prescaler = 2, clock = F_CPU /2
     clear_bit(TCCR1B, CS12);
     clear_bit(TCCR1B, CS11);
     set_bit( TCCR1B, CS10);

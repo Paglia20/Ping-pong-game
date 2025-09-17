@@ -12,48 +12,43 @@
 
 #define DEADZONE 20      
 
-Positions pos;
+Joystick joystick;
 
-static inline int16_t percent_axis(uint8_t val, uint8_t zero);
+static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max);
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc);
 
-// Defines PD2 and PD3 as input Buttons
-void init_button(void) {
-	clear_bit(DDRD,PD2); 
-	clear_bit(DDRD,PD3);
-}
 
 //for some reasons these two functions need to use printf_P to work properly
 void print_joystick(void) { 
-	printf_P(PSTR("X: (%4d%%) | Y: (%4d%%) | Dir: %S\r\n"), 
-        pos.x_val_perc, pos.y_val_perc,
-        (pos.dir == UP) ? PSTR("UP") : (pos.dir == DOWN) ? PSTR("DOWN") : (pos.dir == LEFT) ? PSTR("LEFT") : (pos.dir == RIGHT) ? PSTR("RIGHT") : PSTR("NEUTRAL"));
+	printf_P(PSTR("X: %d (%d%%) | Y: %d (%d%%) | Dir: %S\r\n"), 
+        joystick.x_val, joystick.x_val_perc, joystick.y_val, joystick.y_val_perc,
+        (joystick.dir == UP) ? PSTR("UP") : (joystick.dir == DOWN) ? PSTR("DOWN") : (joystick.dir == LEFT) ? PSTR("LEFT") : (joystick.dir == RIGHT) ? PSTR("RIGHT") : PSTR("NEUTRAL"));
 	
 } 
 
 void print_zeros(void) { 
 	printf_P(PSTR("X0: (%d) | Y0: (%d)\r\n"), 
-        pos.x_zero, pos.y_zero); 
+        joystick.x_zero, joystick.y_zero); 
 } 
 
 void calibrate(void) {
 	uint8_t *data;
 	data = adc_read();
 
-	pos.x_zero = *data;
-	pos.y_zero = *(data+1);
+	joystick.x_zero = *data;
+	joystick.y_zero = *(data+1);
 }
 
 
-static inline int16_t percent_axis(uint8_t val, uint8_t zero) {
+static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max) {
     if (val >= zero) {
         uint16_t num = (uint16_t)(val - zero) * 100u;
-        uint16_t den = (uint16_t)(255u - zero);
+        uint16_t den = (uint16_t)(max - zero);
         return den ? (int16_t)(num / den) : 0;
     } else {
-        uint16_t den = (zero > 0) ? (uint16_t)(zero - 1u) : 1u;
-        uint16_t num = (uint16_t)val * 100u;
-        return (int16_t)(num / den) - 100;
+        uint16_t num = (uint16_t)(zero - val) * 100u;
+        uint16_t den = (uint16_t)(zero - min);
+        return den ? -(int16_t)(num / den) : 0;
     }
 }
 
@@ -74,12 +69,12 @@ void update_position(void){
     uint8_t x, y;
     x = data[0];
     y = data[1];
-	pos.x_val = x;
-    pos.y_val = y;
-    pos.x_val_perc  = percent_axis(x, pos.x_zero);
-    pos.y_val_perc  = percent_axis(y, pos.y_zero);
+	joystick.x_val = x;
+    joystick.y_val = y;
+    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, 66, 247);
+    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, 61, 250);
 
-    pos.dir = dir_from_xy(pos.x_val_perc, pos.y_val_perc);
+    joystick.dir = dir_from_xy(joystick.x_val_perc, joystick.y_val_perc);
 
 	printf_P(PSTR("updated position\r\n"));
 	

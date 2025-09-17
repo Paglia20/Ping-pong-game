@@ -22,10 +22,10 @@ typedef struct {
     volatile int16_t x_val_perc;
     volatile int16_t y_val_perc;
     volatile Direction dir;
-} Positions;
+} Joystick;
 
 // External global variable defined in joystick.c
-extern Positions pos;
+extern Joystick joystick;
 
 void init_button(void);
 
