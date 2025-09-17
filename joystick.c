@@ -25,9 +25,10 @@ void init_button(void) {
 
 //for some reasons these two functions need to use printf_P to work properly
 void print_joystick(void) { 
-	printf_P(PSTR("X: %d (%d) | Y: %d (%d) | Dir: %s\r\n"), pos.x_val, pos.y_val,
-        pos.x_val_perc, pos.y_val_perc, 
-        (pos.dir == UP) ? "UP   " : (pos.dir == DOWN) ? "DOWN " : (pos.dir == LEFT) ? "LEFT " : (pos.dir == RIGHT) ? "RIGHT" : "NEUTRAL");
+	printf_P(PSTR("X: (%4d%%) | Y: (%4d%%) | Dir: %S\r\n"), 
+        pos.x_val_perc, pos.y_val_perc,
+        (pos.dir == UP) ? PSTR("UP") : (pos.dir == DOWN) ? PSTR("DOWN") : (pos.dir == LEFT) ? PSTR("LEFT") : (pos.dir == RIGHT) ? PSTR("RIGHT") : PSTR("NEUTRAL"));
+	
 } 
 
 void print_zeros(void) { 
@@ -58,11 +59,11 @@ static inline int16_t percent_axis(uint8_t val, uint8_t zero) {
 
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc) {
     // manual abs to avoid any signed/width surprises
-/*     int16_t ay = (y_perc >= 0) ? y_perc : (int16_t)(-y_perc);
+    int16_t ay = (y_perc >= 0) ? y_perc : (int16_t)(-y_perc);
     if (x_perc >  DEADZONE && x_perc >= ay) return RIGHT;
     if (x_perc < -DEADZONE && -x_perc >= ay) return LEFT;
     if (y_perc >  DEADZONE) return UP;
-    if (y_perc < -DEADZONE) return DOWN; */
+    if (y_perc < -DEADZONE) return DOWN;
     return NEUTRAL;
 }
 
@@ -81,6 +82,6 @@ void update_position(void){
     pos.dir = dir_from_xy(pos.x_val_perc, pos.y_val_perc);
 
 	printf_P(PSTR("updated position\r\n"));
-	print_joystick();
+	
 }
 

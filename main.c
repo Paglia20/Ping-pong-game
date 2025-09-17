@@ -76,16 +76,17 @@ void test_adc(void) {
 
 void test_joystick(void) {
     //init_button();
-    adc_init();
     calibrate();
 
     printf("Joystick test start\r\n");
 
     print_zeros();
 
-    update_position();
-    print_joystick();
-    _delay_ms(200);
+    while (1) {
+        update_position();
+        print_joystick();
+        _delay_ms(200);
+    }
 } 
 
 
@@ -105,7 +106,7 @@ int main(void) {
     //TEST SRAM
 
     //dec_test();
-
+	//print_joystick();
     // SRAM_test(); 
 
 
