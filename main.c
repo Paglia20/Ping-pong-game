@@ -67,54 +67,53 @@ void test_adc(void) {
     while (1) {
         uint8_t *values = adc_read();  // CH0..CH3
 
-        printf("CH0=%3u  CH1=%3u  CH2=%3u  CH3=%3u\r\n",
-               values[0], values[1], values[2], values[3]);
+        printf("X =%3u  Y =%3u  CH2 (/) =%3u  CH3 (/) =%3u\r\n",
+               values[0], values[1], 0, 0);
 
         _delay_ms(200);
     }
 }
 
-void test_joystick(void) {
-    init_button();
+/* void test_joystick(void) {
+    //init_button();
     adc_init();
     calibrate();
 
     printf("Joystick test start\r\n");
 
+    print_zeros();
+
     while (1) {
-        // Update joystick position and direction
-        
+        update_position();
         print_joystick();
         _delay_ms(50);
     }
-}
-
-
+} */
 
 
 int main(void) {
-   // fflush(stdout);
+   // INITS
     UART_init(F_CPU, BAUD);    // 9600 8N1
+    XMEM_init();
 
-    test_uart();
+    //test_uart();
 
 
     //TEST D LATCH
     //test_dlatch();
 
     //TEST SRAM
-    // XMEM_init();
 
-    // dec_test();
+    dec_test();
 
     // SRAM_test(); 
 
 
 
     // // Test ADC
-    // adc_init();
+    adc_init();
 
-    //test_adc();
+    test_adc();
 
 }
 

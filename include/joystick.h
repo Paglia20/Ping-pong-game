@@ -15,15 +15,13 @@ typedef enum {
 
 // Joystick and slider position structure
 typedef struct {
-    int16_t x_zero;
-    int16_t y_zero;
+    volatile int16_t x_zero;
+    volatile int16_t y_zero;
     volatile int16_t x_val;
     volatile int16_t y_val;
     volatile int16_t x_val_perc;
     volatile int16_t y_val_perc;
     volatile Direction dir;
-    volatile uint8_t slider1_val;
-    volatile uint8_t slider2_val;
 } Positions;
 
 // External global variable defined in joystick.c
@@ -33,8 +31,10 @@ void init_button(void);
 
 void print_joystick(void);
 
+void print_zeros(void);
+
 void calibrate(void);
 
-// others
+void update_position(void);
 
 #endif // JOYSTICK_H
