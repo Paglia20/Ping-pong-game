@@ -132,7 +132,7 @@ int main(void) {
     adc_init();
 
     //test_adc();
-    //test_joystick();
-    test_slider();
+    test_joystick();
+    //test_slider();
 }
 

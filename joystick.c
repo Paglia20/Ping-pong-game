@@ -71,8 +71,8 @@ void update_position(void){
     y = data[1];
 	joystick.x_val = x;
     joystick.y_val = y;
-    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, 66, 247);
-    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, 61, 250);
+    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, 67, 247); //min and max x from testing
+    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, 62, 250); //min and max y from testing
 
     joystick.dir = dir_from_xy(joystick.x_val_perc, joystick.y_val_perc);
 
