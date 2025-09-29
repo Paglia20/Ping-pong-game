@@ -8,12 +8,22 @@ static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); }
 static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN); }
 static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN); }
 
-static inline void set_col_page(uint8_t page, uint8_t col){
+static inline void set_page(uint8_t page){
     cs_low(); dc_cmd();
     SPI_txrx(0xB0 | (page & 0x07));       // set page
+    cs_high();
+}
+
+static inline void set_col(uint8_t col){
+    cs_low(); dc_cmd();
     SPI_txrx(0x00 | (col & 0x0F));        // low nibble col
     SPI_txrx(0x10 | (col >> 4));          // high nibble col
     cs_high();
+}
+
+static inline void set_col_page(uint8_t page, uint8_t col){
+    set_page(page);
+    set_col(col);
 }
 
 void oled_write_cmd1(uint8_t c){
