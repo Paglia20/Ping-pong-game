@@ -63,21 +63,26 @@ void OLED_init(void){
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
-    //_delay_ms(10);
-
-    oled_write_cmd1(0xA5);   // Entire Display ON
-    _delay_ms(200);
-    oled_write_cmd1(0xA4);   // back to RAM
 }
 
-void OLED_fill(uint8_t pattern){          // pattern=0xFF tutto acceso; 0x00 tutto spento
+void OLED_fill_strips (void){          // pattern=0xFF tutto acceso; 0x00 tutto spento
     for (uint8_t p=0; p<8; ++p){
         set_col_page(p, 0);
         cs_low(); dc_data();
-        for (uint8_t x=0; x<128; ++x) SPI_txrx(pattern);
+        for (uint8_t x=0; x<128; ++x) {
+            if (x % 2 == 1){
+                SPI_txrx(0xFF);
+            }else{
+                SPI_txrx(0x00);
+            }          
+        }
         cs_high();
     }
 }
+
+
+
+
 
 
 //remember to check

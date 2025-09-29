@@ -4,7 +4,7 @@
  * Author: Paglia20
  */
 
-#define F_CPU 4915200UL  // 4.9152 MHz
+#define F_CPU 4915200UL // 4.9152 MHz
 #define BAUD 9600
 
 #include <avr/io.h>
@@ -15,39 +15,40 @@
 #include "include/SRAM.h"
 #include "include/decoder.h"
 #include "include/ADC.h"
-    // printf("Starting spi init...\n\r");
+// printf("Starting spi init...\n\r");
 
-    // SPI_init();
-    // printf("Starting OLED init...\n\r");
+// SPI_init();
+// printf("Starting OLED init...\n\r");
 
+// OLED_init();
 
-    // OLED_init();
-
-    
-    // test_OLED();
+// test_OLED();
 #include "include/joystick.h"
 #include "include/slider.h"
 #include "include/bit_macros.h"
 #include "include/SPI.h"
 #include "include/OLED.h"
 
-//for part 4 Defines PD2 Buttons
-void init_button(void) {
-	clear_bit(DDRD,PD2); 
+// for part 4 Defines PD2 Buttons
+void init_button(void)
+{
+    clear_bit(DDRD, PD2);
 }
 
-void pulse_ALE(void) {
+void pulse_ALE(void)
+{
     // Genera un impulso basso-alto-basso su PE1 per latchare i dati
-    PORTE |= (1 << PE1);   // PE1 alto (latch abilita)
+    PORTE |= (1 << PE1); // PE1 alto (latch abilita)
     _delay_us(1);
-    PORTE &= ~(1 << PE1);  // PE1 basso (latch disabilita)
+    PORTE &= ~(1 << PE1); // PE1 basso (latch disabilita)
     _delay_us(1);
 }
 
-void test_dlatch(void){
+void test_dlatch(void)
+{
     printf("Starting Latch test...\n\r");
 
-     // Imposta PA0–PA7 come outpuADCt (bus dati)
+    // Imposta PA0–PA7 come outpuADCt (bus dati)
     DDRA = 0xFF;
     // Imposta PE1 come output (ALE)
     DDRE |= (1 << PE1);
@@ -58,31 +59,36 @@ void test_dlatch(void){
 
     uint8_t value = 0;
 
-    while (1) {
-        PORTA = value;     
-        pulse_ALE();       
-        _delay_ms(200);    
-        value++;           
-    } 
+    while (1)
+    {
+        PORTA = value;
+        pulse_ALE();
+        _delay_ms(200);
+        value++;
+    }
 }
 
-void test_uart(void) {
+void test_uart(void)
+{
     printf("UART ready! Type something:\n\r");
-    while (1) {
-        char c = uart_getc();     // wait for user input (blocking so dots)
-        //printf("typed c: %c\n\r", c, c);
+    while (1)
+    {
+        char c = uart_getc(); // wait for user input (blocking so dots)
+        // printf("typed c: %c\n\r", c, c);
 
-        //uart_putc(c);             // echo it back
-        printf("You typed: %c\n\r", c);        
-    } 
+        // uart_putc(c);             // echo it back
+        printf("You typed: %c\n\r", c);
+    }
 }
 
-void test_adc(void) {
+void test_adc(void)
+{
 
     printf("ADC test start\r\n");
 
-    while (1) {
-        uint8_t *values = adc_read();  // CH0..CH3
+    while (1)
+    {
+        uint8_t *values = adc_read(); // CH0..CH3
 
         printf("X =%3u  Y =%3u  SLIDER =%3u  CH3 (/) =%3u\r\n",
                values[0], values[1], values[2], 0);
@@ -91,76 +97,75 @@ void test_adc(void) {
     }
 }
 
-void test_joystick(void) {
+void test_joystick(void)
+{
     calibrate();
 
     printf("Joystick test start\r\n");
 
     print_zeros();
 
-    while (1) {
+    while (1)
+    {
         update_position();
         print_joystick();
         _delay_ms(200);
     }
-} 
+}
 
-void test_slider(void) {
+void test_slider(void)
+{
     calibrate_slider();
 
     printf("Slider test start\r\n");
 
     print_slider_zeros();
 
-    while (1) {
+    while (1)
+    {
         update_slider();
         print_slider();
         _delay_ms(200);
     }
-} 
-
-void test_OLED(void) {
-    printf_P(PSTR("starting oled test\n\r")); 
-
-    OLED_fill(0xFF);              // prova: accendi tutti i pixel
 }
 
-int main(void) {
+void test_OLED(void){
+    printf_P(PSTR("starting oled test\n\r"));
+
+    OLED_fill_strips();
+}
+
+int main(void)
+{
+
     fflush(stdout);
 
-   // INITS
-    UART_init(F_CPU, BAUD);    // 9600 8N1
+    // INITS
+    UART_init(F_CPU, BAUD); // 9600 8N1
     XMEM_init();
-    
-    //printf_P(PSTR("XMEM init done\n\r")); 
-    //test_uart();
 
+    // printf_P(PSTR("XMEM init done\n\r"));
+    // test_uart();
 
-    //TEST D LATCH
-    //test_dlatch();
+    // TEST D LATCH
+    // test_dlatch();
 
-    //TEST SRAM
+    // TEST SRAM
 
-    //dec_test();
-	//print_joystick();
-    // SRAM_test(); 
-
-
+    // dec_test();
+    // print_joystick();
+    //  SRAM_test();
 
     // // Test ADC
     adc_init();
 
-    //test_adc();
-    //test_joystick();
-    //test_slider();
+    // test_adc();
+    // test_joystick();
+    // test_slider();
 
-
-     SPI_init();
-
+    SPI_init();
 
     OLED_init();
 
-    
-     test_OLED();
+    //test_OLED();
 }
-
