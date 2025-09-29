@@ -33,9 +33,14 @@ static inline void set_col(uint8_t col){
 }
 
 static inline void set_col_page(uint8_t page, uint8_t col){
-    set_page(page);
-    set_col(col);
+    cs_low(); dc_cmd();
+    SPI_txrx(0xB0 | (page & 0x07));             // page
+    SPI_txrx(0x10 | ((col >> 4) & 0x0F));       // high nibble (prima o dopo è ok)
+    SPI_txrx(0x00 | (col & 0x0F));              // low nibble
+    cs_high();
 }
+
+
 
 void oled_write_cmd1(uint8_t c){
     cs_low(); 
@@ -86,6 +91,9 @@ void OLED_init(void){
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
+
+    //comment
+    oled_write_cmd1(0xA5); _delay_ms(200); oled_write_cmd1(0xA4);
 }
 
 void OLED_fill_strips (void){          // pattern=0xFF tutto acceso; 0x00 tutto spento
@@ -184,11 +192,15 @@ void oled_clear_line(uint8_t page){
 }
 
 
-void oled_clear (void) {
-    for (size_t i = 0; i < 8; i++){
-        oled_clear_line(i);
+void oled_clear(void){
+    for (uint8_t p = 0; p < 8; ++p){
+        set_col_page(p, 0);
+        cs_low(); dc_data();
+        for (uint8_t x = 0; x < 128; ++x) SPI_txrx(0x00);
+        cs_high();
     }
-
-    oled_home();
+    cursor_page = 0;
+    cursor_col  = 0;
+    set_col_page(0,0);
 }
 
