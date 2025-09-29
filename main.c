@@ -15,6 +15,16 @@
 #include "include/SRAM.h"
 #include "include/decoder.h"
 #include "include/ADC.h"
+    // printf("Starting spi init...\n\r");
+
+    // SPI_init();
+    // printf("Starting OLED init...\n\r");
+
+
+    // OLED_init();
+
+    
+    // test_OLED();
 #include "include/joystick.h"
 #include "include/slider.h"
 #include "include/bit_macros.h"
@@ -110,6 +120,8 @@ void test_slider(void) {
 } 
 
 void test_OLED(void) {
+    printf_P(PSTR("starting oled test\n\r")); 
+
     OLED_fill(0xFF);              // prova: accendi tutti i pixel
 }
 
@@ -119,7 +131,8 @@ int main(void) {
    // INITS
     UART_init(F_CPU, BAUD);    // 9600 8N1
     XMEM_init();
-
+    
+    //printf_P(PSTR("XMEM init done\n\r")); 
     //test_uart();
 
 
@@ -140,9 +153,14 @@ int main(void) {
     //test_adc();
     //test_joystick();
     //test_slider();
-    SPI_init();
+
+
+     SPI_init();
+
+
     OLED_init();
+
     
-    test_OLED();
+     test_OLED();
 }
 

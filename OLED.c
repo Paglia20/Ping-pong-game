@@ -47,20 +47,24 @@ void oled_write_data(const uint8_t* p, uint16_t n){
 void OLED_init(void){
     _delay_ms(10);              
 
-    cmd1(0xAE);                 // OFF
-    cmd1(0xA1);                 // seg remap
-    cmd2(0xDA, 0x12);           // COM pins
-    cmd1(0xC8);                 // scan dir
-    cmd2(0xA8, 0x3F);           // 1/64
-    cmd2(0xD5, 0x80);           // clock
-    cmd2(0x81, 0x50);           // contrast
-    cmd2(0xD9, 0x21);           // precharge
-    cmd1(0x20); cmd1(0x02);     // page addressing
-    cmd2(0xDB, 0x30);           // VCOMH
-    cmd2(0xAD, 0x00);           // master cfg
-    cmd1(0xA4);                 // follow RAM
-    cmd1(0xA6);                 // normal
-    cmd1(0xAF);                 // ON
+    oled_write_cmd1(0xAE);                 // OFF
+    oled_write_cmd1(0xA1);                 // seg remap
+    oled_write_cmd2(0xDA, 0x12);           // COM pins
+    oled_write_cmd1(0xC8);                 // scan dir
+    oled_write_cmd2(0xA8, 0x3F);           // 1/64
+    oled_write_cmd2(0xD5, 0x80);           // clock
+    oled_write_cmd2(0x81, 0x50);           // contrast
+    oled_write_cmd2(0xD9, 0x21);           // precharge
+    oled_write_cmd1(0x20); oled_write_cmd1(0x02);// page addressing
+    oled_write_cmd2(0xDB, 0x30);           // VCOMH
+    oled_write_cmd2(0xAD, 0x00);           // master cfg
+    oled_write_cmd1(0xA4);                 // follow RAM
+    oled_write_cmd1(0xA6);                 // normal
+    oled_write_cmd1(0xAF);                 // ON
+    
+    _delay_ms(10);              
+
+    oled_write_cmd1(0xA5);                 
 }
 
 void OLED_fill(uint8_t pattern){          // pattern=0xFF tutto acceso; 0x00 tutto spento
