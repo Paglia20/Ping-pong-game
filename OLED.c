@@ -1,6 +1,6 @@
 
-#include <OLED.h>
-#include <SPI.h>
+#include "include/OLED.h"
+#include "include/SPI.h"
 
 static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED); }
 static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); }
