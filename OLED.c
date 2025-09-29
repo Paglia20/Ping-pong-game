@@ -120,7 +120,7 @@ void oled_set_cursor(uint8_t page, uint8_t col){
 }
 
 // Advance to next line (8 px down), col=0
-static void oled_newline(void){
+void oled_newline(void){
     cursor_col = 0;
     cursor_page = (cursor_page < 7) ? (cursor_page + 1) : 0;
 }
@@ -168,6 +168,7 @@ void oled_print(const char *s) {
     }
 }
 
+
 void oled_clear_line(uint8_t page){
     if (page > 7) return;         
     set_col_page(page, 0);         // vai a col=0 di quella pagina
@@ -180,5 +181,12 @@ void oled_clear_line(uint8_t page){
     // reset cursore logico a inizio linea
     cursor_page = page;
     cursor_col  = 0;
+}
+
+
+void oled_clear (void) {
+    for (size_t i = 0; i < 8; i++){
+        oled_clear_line(i);
+    }
 }
 

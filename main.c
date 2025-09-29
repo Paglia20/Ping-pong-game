@@ -169,7 +169,9 @@ int main(void)
 
     //test_OLED();
 
+   // oled_clear();
     oled_home();
+
     oled_print("HELLO WORLD");
 
     _delay_ms(2000);
