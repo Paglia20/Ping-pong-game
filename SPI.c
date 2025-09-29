@@ -6,7 +6,7 @@ void SPI_init(void) {
     // MISO (PB6) input
     DDRB  &= ~(1<<DDB6); 
 
-    //D/C output
+    // D/C output
     DC_DDR |= (1<<DC_PIN);
 
     // /CS come output e a riposo alto //port |= (1<<pin) 

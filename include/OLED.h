@@ -18,4 +18,12 @@ void OLED_init(void);
 
 void OLED_fill_strips(void);
 
+void oled_home(void);
+void oled_set_cursor(uint8_t page, uint8_t col);
+void oled_newline(void);
+void oled_putchar(char c);
+void oled_clear_line(uint8_t page);
+void oled_print(const char* s);
+
+
 #endif // OLED_H

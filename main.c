@@ -168,4 +168,17 @@ int main(void)
     OLED_init();
 
     //test_OLED();
+
+    oled_home();
+    oled_print("HELLO WORLD");
+
+    _delay_ms(2000);
+
+    // clear first line (page 0)
+    oled_clear_line(0);
+
+    oled_set_cursor(1,0);
+    oled_print("Line 2 after clear");
+
+    while (1) { }
 }
