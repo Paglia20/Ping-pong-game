@@ -18,6 +18,8 @@
 #include "include/joystick.h"
 #include "include/slider.h"
 #include "include/bit_macros.h"
+#include "include/SPI.h"
+#include "include/OLED.h"
 
 //for part 4 Defines PD2 Buttons
 void init_button(void) {
@@ -107,6 +109,10 @@ void test_slider(void) {
     }
 } 
 
+void test_OLED(void) {
+    OLED_fill(0xFF);              // prova: accendi tutti i pixel
+}
+
 int main(void) {
     fflush(stdout);
 
@@ -132,7 +138,11 @@ int main(void) {
     adc_init();
 
     //test_adc();
-    test_joystick();
+    //test_joystick();
     //test_slider();
+    SPI_init();
+    OLED_init();
+    
+    test_OLED();
 }
 
