@@ -188,5 +188,7 @@ void oled_clear (void) {
     for (size_t i = 0; i < 8; i++){
         oled_clear_line(i);
     }
+
+    oled_home();
 }
 
