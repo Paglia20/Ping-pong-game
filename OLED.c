@@ -92,8 +92,7 @@ void OLED_init(void){
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
 
-    //comment
-    oled_write_cmd1(0xA5); _delay_ms(200); oled_write_cmd1(0xA4);
+    
 }
 
 void OLED_fill_strips (void){          // pattern=0xFF tutto acceso; 0x00 tutto spento
@@ -123,8 +122,7 @@ void oled_set_cursor(uint8_t page, uint8_t col){
     cursor_page = page;
     cursor_col  = col;
 
-    //perchè set cursor non richiama set_col_page?
-    set_col_page(cursor_page, cursor_col);   //nel dubbio lo metto
+    set_col_page(cursor_page, cursor_col);   
 }
 
 // Advance to next line (8 px down), col=0

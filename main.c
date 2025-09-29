@@ -15,25 +15,12 @@
 #include "include/SRAM.h"
 #include "include/decoder.h"
 #include "include/ADC.h"
-// printf("Starting spi init...\n\r");
-
-// SPI_init();
-// printf("Starting OLED init...\n\r");
-
-// OLED_init();
-
-// test_OLED();
 #include "include/joystick.h"
 #include "include/slider.h"
 #include "include/bit_macros.h"
 #include "include/SPI.h"
 #include "include/OLED.h"
 
-// for part 4 Defines PD2 Buttons
-void init_button(void)
-{
-    clear_bit(DDRD, PD2);
-}
 
 void pulse_ALE(void)
 {
@@ -167,9 +154,9 @@ int main(void)
 
     OLED_init();
 
-    //test_OLED();
+    test_OLED();
 
-   // oled_clear();
+    //oled_clear();
     oled_home();
 
     oled_print("HELLO WORLD");
