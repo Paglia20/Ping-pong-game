@@ -13,6 +13,10 @@
 #define CS_IO_DDR     DDRB
 #define CS_IO_PIN     PB1
 
+#define DC_PORT PORTD
+#define DC_DDR  DDRD
+#define DC_PIN  PD2   
+
 typedef enum {
     SPI_SLAVE_OLED = 0,
     SPI_SLAVE_IO   = 1

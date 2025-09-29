@@ -5,8 +5,8 @@
 static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED); }
 static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); }
 
-static inline void dc_cmd(void){ OLED_DC_PORT &= ~(1<<OLED_DC_PIN); }
-static inline void dc_data(void){ OLED_DC_PORT |=  (1<<OLED_DC_PIN); }
+static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN); }
+static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN); }
 
 static inline void set_col_page(uint8_t page, uint8_t col){
     cs_low(); dc_cmd();
@@ -55,16 +55,19 @@ void OLED_init(void){
     oled_write_cmd2(0xD5, 0x80);           // clock
     oled_write_cmd2(0x81, 0x50);           // contrast
     oled_write_cmd2(0xD9, 0x21);           // precharge
-    oled_write_cmd1(0x20); oled_write_cmd1(0x02);// page addressing
+
+    oled_write_cmd2(0x20, 0x02); // page addressing
+
     oled_write_cmd2(0xDB, 0x30);           // VCOMH
     oled_write_cmd2(0xAD, 0x00);           // master cfg
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
-    
-    _delay_ms(10);              
+    //_delay_ms(10);
 
-    oled_write_cmd1(0xA5);                 
+    oled_write_cmd1(0xA5);   // Entire Display ON
+    _delay_ms(200);
+    oled_write_cmd1(0xA4);   // back to RAM
 }
 
 void OLED_fill(uint8_t pattern){          // pattern=0xFF tutto acceso; 0x00 tutto spento
@@ -75,3 +78,8 @@ void OLED_fill(uint8_t pattern){          // pattern=0xFF tutto acceso; 0x00 tut
         cs_high();
     }
 }
+
+
+//remember to check
+//	•	IREF = resistenza a massa.
+//  •	VCOMH = condensatore a massa.

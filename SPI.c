@@ -6,6 +6,9 @@ void SPI_init(void) {
     // MISO (PB6) input
     DDRB  &= ~(1<<DDB6); 
 
+    //D/C output
+    DC_DDR |= (1<<DC_PIN);
+
     // /CS come output e a riposo alto //port |= (1<<pin) 
     CS_OLED_DDR |= (1<<CS_OLED_PIN);
     CS_IO_DDR   |= (1<<CS_IO_PIN);
@@ -16,7 +19,7 @@ void SPI_init(void) {
     // disabilita slave hardware
     PORTB |= (1<<PB4);
 
-    // Enable SPI, Master, MODE0 already on (CPOL=0, CPHA=0), SCK=fosc/16
+    // Enable SPI, Master, MODE0 already on (CPOL=0, CPHA=0), only SPR0 means SCK=fosc/16
     SPCR = (1<<SPE) | (1<<MSTR) | (1<<SPR0);
 }
 
