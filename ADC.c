@@ -1,23 +1,14 @@
-#include <avr/io.h>
-#include <util/delay.h>
-#include <stdio.h>
-
 #include "include/UART.h"
 #include "include/SRAM.h"
 #include "include/decoder.h"
 #include "include/bit_macros.h"
-
-
+#include "ADC.h"
 
 #define adc_address 0x1000
 #define num_channels 3
 
 //ADC storage
 static volatile uint8_t * const adcVal = (uint8_t *)adc_address;
-
-// TODO collega il pin BUSY del MAX156 a PD4
-#define ADC_BUSY_PINR  PIND
-#define ADC_BUSY_BIT   PD4      
 
 //ADC values out
 static uint8_t adcData[num_channels];
@@ -49,7 +40,7 @@ void adc_init (void){
     OCR1AH = 0x00;
     OCR1AL = 0x00;
 
-    //(CS12:10 = 001) : // prescaler = 2, clock = F_CPU /2
+    //(CS12:10 = 001) : // No prescaling 
     clear_bit(TCCR1B, CS12);
     clear_bit(TCCR1B, CS11);
     set_bit( TCCR1B, CS10);
@@ -89,12 +80,6 @@ uint8_t * adc_read(){
 
 
 //note per domani
-// decidere MODE: Single ended unipolar? 
-// testare CS
-// testare/collegare clock PD5
-// collegare BUSY a PD4
-//EXTERNAL VOLTAGE???
 
-//testare adc
 
 //quando leggi un array, quindi un pointer, ti basta poi fare *p o *(p+1)
