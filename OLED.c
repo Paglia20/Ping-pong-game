@@ -40,16 +40,14 @@ static inline void set_col_page(uint8_t page, uint8_t col){
     cs_high();
 }
 
-static inline void set_pos_and_write(uint8_t page, uint8_t col,
-                                     const uint8_t* bytes, uint8_t n){
+static inline void set_pos_and_write(uint8_t page, uint8_t col, const uint8_t* bytes, uint8_t n){
     cs_low();
-
-    dc_cmd();                          // has 3 NOPs already
+    dc_cmd();                          
     SPI_txrx(0xB0 | (page & 0x07));
     SPI_txrx(0x10 | ((col >> 4) & 0x0F));
     SPI_txrx(0x00 | (col & 0x0F));
 
-    dc_data();                         // has 3 NOPs already
+    dc_data();                         
     while (n--) SPI_txrx(*bytes++);
     cs_high();
 }
@@ -94,19 +92,20 @@ void OLED_init(void){
     oled_write_cmd1(0xC8);                 // scan dir
     oled_write_cmd2(0xA8, 0x3F);           // 1/64
     oled_write_cmd2(0xD5, 0x80);           // clock
-    oled_write_cmd2(0x81, 0x50);           // contrast
-    oled_write_cmd2(0xD9, 0x21);           // precharge
+    oled_write_cmd2(0x81, 0x7F);           // contrast
+    oled_write_cmd2(0xD9, 0xF1);           // precharge
 
     oled_write_cmd2(0x20, 0x02); // page addressing
 
-    oled_write_cmd2(0xDB, 0x30);           // VCOMH
+    oled_write_cmd2(0xDB, 0x34);           // VCOMH
     oled_write_cmd2(0xAD, 0x00);           // master cfg
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
+    _delay_ms(100);              
 
     oled_clear();
-
+    oled_home();
     
 }
 

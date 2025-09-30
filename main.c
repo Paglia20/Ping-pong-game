@@ -119,12 +119,10 @@ void test_slider(void)
 void test_OLED(void){
     printf_P(PSTR("starting oled test\n\r"));
     
-    
-
     _delay_ms(2000);
 
-    oled_clear();
-    oled_home();
+    // oled_clear();
+    // oled_home();
 
     OLED_fill_strips();
 
