@@ -27,16 +27,16 @@ static inline void set_page(uint8_t page){
 //Again the masks to not send bits outside the 4-bit fields.
 static inline void set_col(uint8_t col){
     cs_low(); dc_cmd();
-    SPI_txrx(0x00 | (col & 0x0F));             // 00 low nibble = bits [3:0]
     SPI_txrx(0x10 | ((col >> 4) & 0x0F));      // 10 high nibble = bits [6:4]
+    SPI_txrx(0x00 | (col & 0x0F));             // 00 low nibble = bits [3:0]
     cs_high();
 }
 
 static inline void set_col_page(uint8_t page, uint8_t col){
     cs_low(); dc_cmd();
-    SPI_txrx(0xB0 | (page & 0x07));             // page
-    SPI_txrx(0x10 | ((col >> 4) & 0x0F));       // high nibble (prima o dopo è ok)
-    SPI_txrx(0x00 | (col & 0x0F));              // low nibble
+    SPI_txrx(0xB0 | (page & 0x07));             
+    SPI_txrx(0x10 | ((col >> 4) & 0x0F));       
+    SPI_txrx(0x00 | (col & 0x0F));              
     cs_high();
 }
 
@@ -95,7 +95,7 @@ void OLED_init(void){
     
 }
 
-void OLED_fill_strips (void){          // pattern=0xFF tutto acceso; 0x00 tutto spento
+void OLED_fill_strips (void){         
     for (uint8_t p=0; p<8; ++p){
         set_col_page(p, 0);
         cs_low(); dc_data();
@@ -113,7 +113,7 @@ void OLED_fill_strips (void){          // pattern=0xFF tutto acceso; 0x00 tutto 
 void oled_home(void){
     cursor_page = 0;
     cursor_col  = 0;
-    set_col_page(0,0);   // posizione HW del controller
+    set_col_page(0,0);   
 }
 
 void oled_set_cursor(uint8_t page, uint8_t col){
@@ -128,12 +128,11 @@ void oled_set_cursor(uint8_t page, uint8_t col){
 // Advance to next line (8 px down), col=0
 void oled_newline(void){
     cursor_col = 0;
-    cursor_page = (cursor_page < 7) ? (cursor_page + 1) : 0;
+    cursor_page = (cursor_page < 7) ? (cursor_page + 1) : 0; // if at last page, wrap to 0
 }
 
 
 void oled_putchar(char c) {
-    // Handle control chars
     if (c == '\n') { oled_newline(); return; }
     if (c == '\r') { cursor_col = 0; return; }
 
@@ -142,7 +141,7 @@ void oled_putchar(char c) {
         c = ' '; // replace unsupported with space
     }
 
-    // Wrap to next line if not enough space for the glyph + spacing
+
     uint8_t needed = FONT5_WIDTH + FONT5_SPACING;
     if (cursor_col > (uint8_t)(127 - needed + 1)) { // +1 because col is inclusive
         oled_newline();
@@ -151,7 +150,7 @@ void oled_putchar(char c) {
     // Position the "cursor"
     set_col_page(cursor_page, cursor_col);
 
-    // Burst-write the 5 columns of the glyph from PROGMEM
+
     cs_low(); 
     dc_data();
     uint8_t idx = (uint8_t)c - 0x20;            // 0..94
@@ -163,7 +162,7 @@ void oled_putchar(char c) {
     SPI_txrx(0x00);
     cs_high();
 
-    // Advance cursor
+
     cursor_col += needed;
 }
 
@@ -177,28 +176,36 @@ void oled_print(const char *s) {
 
 void oled_clear_line(uint8_t page){
     if (page > 7) return;         
-    set_col_page(page, 0);         // vai a col=0 di quella pagina
-    cs_low(); dc_data();
+    cs_low();
+    dc_cmd();
+    SPI_txrx(0xB0 | (page & 0x07));   // set page
+    SPI_txrx(0x10 | 0x00);            // col high = 0
+    SPI_txrx(0x00 | 0x00);            // col low  = 0
+
+    dc_data();
     for (uint8_t x = 0; x < 128; x++) {
-        SPI_txrx(0x00);            // scrivi byte vuoto = 8 pixel spenti
+        SPI_txrx(0x00);
     }
     cs_high();
 
-    // reset cursore logico a inizio linea
     cursor_page = page;
     cursor_col  = 0;
 }
 
-
 void oled_clear(void){
+    cs_low();
     for (uint8_t p = 0; p < 8; ++p){
-        set_col_page(p, 0);
-        cs_low(); dc_data();
-        for (uint8_t x = 0; x < 128; ++x) SPI_txrx(0x00);
-        cs_high();
+        dc_cmd();
+        SPI_txrx(0xB0 | (p & 0x07));  // set page
+        SPI_txrx(0x10 | 0x00);        // col high = 0
+        SPI_txrx(0x00 | 0x00);        // col low  = 0
+
+        dc_data();
+        for (uint8_t x = 0; x < 128; ++x){
+            SPI_txrx(0x00);
+        }
     }
-    cursor_page = 0;
-    cursor_col  = 0;
-    set_col_page(0,0);
+    cs_high();
+    oled_home();
 }
 
