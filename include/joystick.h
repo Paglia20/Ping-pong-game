@@ -27,8 +27,6 @@ typedef struct {
 // External global variable defined in joystick.c
 extern Joystick joystick;
 
-void init_button(void);
-
 void print_joystick(void);
 
 void print_zeros(void);
