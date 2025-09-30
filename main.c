@@ -20,6 +20,7 @@
 #include "include/bit_macros.h"
 #include "include/SPI.h"
 #include "include/OLED.h"
+#include "include/cursor.h"
 
 
 void pulse_ALE(void)
@@ -177,5 +178,5 @@ int main(void)
     test_OLED();
 
 
-    while (1) { }
+    cursor_game();
 }

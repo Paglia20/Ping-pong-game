@@ -5,7 +5,7 @@
 
 #include <util/delay.h>
 
-void cursor(void){
+void cursor_game(void){
     calibrate();
 
     Pixel p;
