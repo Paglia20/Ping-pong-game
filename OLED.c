@@ -3,8 +3,8 @@
 #include "include/SPI.h"
 #include "include/fonts.h"
 
-#define FONT5_WIDTH 5
-#define FONT5_SPACING 1   // one blank column between chars
+#define FONT_WIDTH 4
+#define FONT_SPACING 1   // one blank column between chars
 
 static uint8_t cursor_page = 0;
 static uint8_t cursor_col  = 0;
@@ -92,6 +92,8 @@ void OLED_init(void){
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
 
+    oled_clear();
+
     
 }
 
@@ -103,7 +105,7 @@ void OLED_fill_strips (void){
             if (x & 1){
                 SPI_txrx(0xFF);
             }else{
-                SPI_txrx(0x00);
+                SPI_txrx(0xFF);
             }          
         }
         cs_high();
@@ -142,7 +144,7 @@ void oled_putchar(char c) {
     }
 
 
-    uint8_t needed = FONT5_WIDTH + FONT5_SPACING;
+    uint8_t needed = FONT_WIDTH + FONT_SPACING;
     if (cursor_col > (uint8_t)(127 - needed + 1)) { // +1 because col is inclusive
         oled_newline();
     }
@@ -154,8 +156,8 @@ void oled_putchar(char c) {
     cs_low(); 
     dc_data();
     uint8_t idx = (uint8_t)c - 0x20;            // 0..94
-    for (uint8_t i = 0; i < FONT5_WIDTH; i++) {
-        uint8_t colbyte = pgm_read_byte(&font5[idx][i]);
+    for (uint8_t i = 0; i < FONT_WIDTH; i++) {
+        uint8_t colbyte = pgm_read_byte(&font4[idx][i]);
         SPI_txrx(colbyte);
     }
     // one blank column as spacing
@@ -179,7 +181,7 @@ void oled_clear_line(uint8_t page){
     cs_low();
     dc_cmd();
     SPI_txrx(0xB0 | (page & 0x07));   // set page
-    SPI_txrx(0x10 | 0x00);            // col high = 0
+    SPI_txrx(0x10 | 0x00);            // col high = 0ge to
     SPI_txrx(0x00 | 0x00);            // col low  = 0
 
     dc_data();
