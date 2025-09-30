@@ -20,7 +20,7 @@ void SPI_init(void) {
     PORTB |= (1<<PB4);
 
     // Enable SPI, Master, MODE0 already on (CPOL=0, CPHA=0), only SPR0 means SCK=fosc/16
-    SPCR = (1<<SPE) | (1<<MSTR) | (1<<SPR0);
+    SPCR = (1<<SPE) | (1<<MSTR) | (1<<SPR1);
 }
 
 void SPI_select(spi_slave_t slave) {

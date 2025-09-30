@@ -9,8 +9,8 @@
 static uint8_t cursor_page = 0;
 static uint8_t cursor_col  = 0;
 
-static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED); }
-static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); }
+static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");}
+static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");}
 
 static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t"); }
 static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");  }
@@ -40,6 +40,19 @@ static inline void set_col_page(uint8_t page, uint8_t col){
     cs_high();
 }
 
+static inline void set_pos_and_write(uint8_t page, uint8_t col,
+                                     const uint8_t* bytes, uint8_t n){
+    cs_low();
+
+    dc_cmd();                          // has 3 NOPs already
+    SPI_txrx(0xB0 | (page & 0x07));
+    SPI_txrx(0x10 | ((col >> 4) & 0x0F));
+    SPI_txrx(0x00 | (col & 0x0F));
+
+    dc_data();                         // has 3 NOPs already
+    while (n--) SPI_txrx(*bytes++);
+    cs_high();
+}
 
 
 void oled_write_cmd1(uint8_t c){
@@ -153,19 +166,13 @@ void oled_putchar(char c) {
     set_col_page(cursor_page, cursor_col);
 
 
-    cs_low(); 
-    dc_data();
-    uint8_t idx = (uint8_t)c - 0x20;            // 0..94
-    for (uint8_t i = 0; i < FONT_WIDTH; i++) {
-        uint8_t colbyte = pgm_read_byte(&font4[idx][i]);
-        SPI_txrx(colbyte);
-    }
-    // one blank column as spacing
-    SPI_txrx(0x00);
-    cs_high();
+    uint8_t buf[FONT_WIDTH + 1];
+    uint8_t idx = (uint8_t)c - 0x20;
+    for (uint8_t i=0;i<FONT_WIDTH;i++) buf[i] = pgm_read_byte(&font4[idx][i]);
+    buf[FONT_WIDTH] = 0x00;   // spacing
 
-
-    cursor_col += needed;
+    set_pos_and_write(cursor_page, cursor_col, buf, FONT_WIDTH + 1);
+    cursor_col += (FONT_WIDTH + FONT_SPACING);  
 }
 
 
