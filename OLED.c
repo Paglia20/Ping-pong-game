@@ -12,8 +12,8 @@ static uint8_t cursor_col  = 0;
 static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED); }
 static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); }
 
-static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN); }
-static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN); }
+static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t"); }
+static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");  }
 
 
 // The (page & 0x07) masks to 3 bits, so even if you pass >7, only the lowest
