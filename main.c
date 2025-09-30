@@ -133,7 +133,13 @@ void test_OLED(void){
     oled_clear_line(0);
 
     oled_set_cursor(3,0);
-    oled_print("Line 2 after clear");
+    oled_print("Line 4 after clear");
+
+
+    _delay_ms(2000);
+
+    oled_clear();
+    oled_home();
 }
 
 int main(void)

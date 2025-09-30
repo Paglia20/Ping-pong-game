@@ -9,11 +9,11 @@
 static uint8_t cursor_page = 0;
 static uint8_t cursor_col  = 0;
 
-static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");}
-static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");}
+static inline void cs_low(void){ SPI_select(SPI_SLAVE_OLED);}
+static inline void cs_high(void){ SPI_deselect(SPI_SLAVE_OLED);}
 
-static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t"); }
-static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN); __asm__ __volatile__("nop\n\tnop\n\tnop\n\t");  }
+static inline void dc_cmd(void){ DC_PORT &= ~(1<<DC_PIN);}
+static inline void dc_data(void){ DC_PORT |=  (1<<DC_PIN);}
 
 
 // The (page & 0x07) masks to 3 bits, so even if you pass >7, only the lowest
@@ -37,18 +37,6 @@ static inline void set_col_page(uint8_t page, uint8_t col){
     SPI_txrx(0xB0 | (page & 0x07));             
     SPI_txrx(0x10 | ((col >> 4) & 0x0F));       
     SPI_txrx(0x00 | (col & 0x0F));              
-    cs_high();
-}
-
-static inline void set_pos_and_write(uint8_t page, uint8_t col, const uint8_t* bytes, uint8_t n){
-    cs_low();
-    dc_cmd();                          
-    SPI_txrx(0xB0 | (page & 0x07));
-    SPI_txrx(0x10 | ((col >> 4) & 0x0F));
-    SPI_txrx(0x00 | (col & 0x0F));
-
-    dc_data();                         
-    while (n--) SPI_txrx(*bytes++);
     cs_high();
 }
 
@@ -92,7 +80,7 @@ void OLED_init(void){
     oled_write_cmd1(0xC8);                 // scan dir
     oled_write_cmd2(0xA8, 0x3F);           // 1/64
     oled_write_cmd2(0xD5, 0x80);           // clock
-    oled_write_cmd2(0x81, 0x7F);           // contrast
+    oled_write_cmd2(0x81, 0xFF);           // contrast
     oled_write_cmd2(0xD9, 0xF1);           // precharge
 
     oled_write_cmd2(0x20, 0x02); // page addressing
@@ -165,13 +153,18 @@ void oled_putchar(char c) {
     set_col_page(cursor_page, cursor_col);
 
 
-    uint8_t buf[FONT_WIDTH + 1];
-    uint8_t idx = (uint8_t)c - 0x20;
-    for (uint8_t i=0;i<FONT_WIDTH;i++) buf[i] = pgm_read_byte(&font4[idx][i]);
-    buf[FONT_WIDTH] = 0x00;   // spacing
+    cs_low();
+    dc_data();
+    uint8_t index = (uint8_t)c - 0x20; // font array starts at ASCII 0x20
+    for (uint8_t i = 0; i < FONT_WIDTH; ++i) {
+        uint8_t col_data = pgm_read_byte(&font4[index][i]);
+        SPI_txrx(col_data);
+    }
 
-    set_pos_and_write(cursor_page, cursor_col, buf, FONT_WIDTH + 1);
-    cursor_col += (FONT_WIDTH + FONT_SPACING);  
+    SPI_txrx(0x00); // spacing column
+    cs_high();
+
+    cursor_col += needed;
 }
 
 
