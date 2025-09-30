@@ -75,22 +75,6 @@ void SPI_read_n(uint8_t* buffer, uint16_t n) {
 // ATmega162 --SPI--> OLED (solo out)
 // ATmega162 --SPI--> AVR IO board (miso per pulasanti and mosi per comandi)
 
-//da fare 
-// OLED.c
-// OLED_select() → abbassa CS_OLED.
-// OLED_deselect() → alza CS_OLED.
-// Ogni funzione (OLED_write_data, OLED_write_cmd) gestisce CS_OLED.
-// in più c'è un D/C (data/command) pin che va settato a seconda se si manda un comando o dei dati
-
-
-// workflow oled:
-// CS_select();
-//   D/C=0;  // comandi
-//   SPI_txrx(...);   // set page/col
-//   D/C=1;  // dati
-//   SPI_txrx(...);   // invio bitmap carattere
-// CS_deselect();
-
 
 
 // IOBoard.c (AVR128DA)
