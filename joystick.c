@@ -10,7 +10,9 @@
 #include "include/bit_macros.h"
 #include "include/joystick.h"
 
-#define DEADZONE 20      
+#define DEADZONE 20   
+#define CALIBRATION_VALUE 5   
+#define AVG_SAMPLES 2
 
 Joystick joystick;
 
@@ -32,11 +34,25 @@ void print_zeros(void) {
 } 
 
 void calibrate(void) {
-	uint8_t *data;
-	data = adc_read();
+    uint8_t all_data[CALIBRATION_VALUE * 2]; 
 
-	joystick.x_zero = *data;
-	joystick.y_zero = *(data+1);
+    for (int i = 0; i < CALIBRATION_VALUE; i++) {
+        uint8_t *data = adc_read();  // assumes data[0] = x, data[1] = y
+        all_data[i * 2]     = data[0]; // x value
+        all_data[i * 2 + 1] = data[1]; // y value
+        printf("Calibration N %d...\r\n", i);
+    }
+
+    uint16_t x_sum = 0;
+    uint16_t y_sum = 0;
+
+    for (int i = 0; i < CALIBRATION_VALUE; i++) {
+        x_sum += all_data[i * 2];     // x values: 0, 2, 4, 6, 8
+        y_sum += all_data[i * 2 + 1]; // y values: 1, 3, 5, 7, 9
+    }
+
+    joystick.x_zero = x_sum / CALIBRATION_VALUE;
+    joystick.y_zero = y_sum / CALIBRATION_VALUE;
 }
 
 
@@ -64,19 +80,35 @@ static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc) {
 
 // Update joystick position and direction
 void update_position(void){
-    uint8_t *data = adc_read();
+    uint8_t all_data[AVG_SAMPLES * 2]; 
 
+    for (int i = 0; i < AVG_SAMPLES; i++) {
+        uint8_t *data = adc_read();  // assumes data[0] = x, data[1] = y
+        all_data[i * 2]     = data[0]; // x value
+        all_data[i * 2 + 1] = data[1]; // y value
+    }
+
+    uint16_t x_sum = 0;
+    uint16_t y_sum = 0;
     uint8_t x, y;
-    x = data[0];
-    y = data[1];
+
+    for (int i = 0; i < AVG_SAMPLES; i++) {
+        x_sum += all_data[i * 2];     
+        y_sum += all_data[i * 2 + 1]; 
+    }
+    x = x_sum / AVG_SAMPLES;
+    y = y_sum / AVG_SAMPLES;
+
 	joystick.x_val = x;
     joystick.y_val = y;
-    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, 67, 247); //min and max x from testing
-    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, 62, 250); //min and max y from testing
+    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, 115, 255); //min and max x from testing
+    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, 115, 255); //min and max y from testing
 
     joystick.dir = dir_from_xy(joystick.x_val_perc, joystick.y_val_perc);
 
 	printf_P(PSTR("updated position\r\n"));
 	
 }
+
+
 

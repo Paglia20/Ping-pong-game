@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 // Joystick direction enum
-typedef enum {
+typedef enum Direction{
     UP,
     DOWN,
     LEFT,
@@ -14,7 +14,7 @@ typedef enum {
 } Direction;
 
 // Joystick and slider position structure
-typedef struct {
+typedef struct Joystick{
     volatile int16_t x_zero;
     volatile int16_t y_zero;
     volatile int16_t x_val;

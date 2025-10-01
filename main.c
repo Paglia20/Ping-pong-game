@@ -34,7 +34,7 @@ void pulse_ALE(void)
 
 void test_dlatch(void)
 {
-    printf("Starting Latch test...\n\r");
+    //printf("Starting Latch test...\n\r");
 
     // Imposta PA0–PA7 come outpuADCt (bus dati)
     DDRA = 0xFF;
@@ -58,21 +58,21 @@ void test_dlatch(void)
 
 void test_uart(void)
 {
-    printf("UART ready! Type something:\n\r");
+    // printf("UART ready! Type something:\n\r");
     while (1)
     {
         char c = uart_getc(); // wait for user input (blocking so dots)
         // printf("typed c: %c\n\r", c, c);
 
         // uart_putc(c);             // echo it back
-        printf("You typed: %c\n\r", c);
+        // printf("You typed: %c\n\r", c);
     }
 }
 
 void test_adc(void)
 {
 
-    printf("ADC test start\r\n");
+    // printf("ADC test start\r\n");
 
     while (1)
     {
@@ -105,7 +105,7 @@ void test_slider(void)
 {
     calibrate_slider();
 
-    printf("Slider test start\r\n");
+    // printf("Slider test start\r\n");
 
     print_slider_zeros();
 
@@ -118,7 +118,7 @@ void test_slider(void)
 }
 
 void test_OLED(void){
-    printf_P(PSTR("starting oled test\n\r"));
+    // printf_P(PSTR("starting oled test\n\r"));
     
     _delay_ms(2000);
 
@@ -168,15 +168,15 @@ int main(void)
     adc_init();
 
     // test_adc();
-    // test_joystick();
+    test_joystick();
     // test_slider();
 
-    SPI_init();
+    // SPI_init();
 
-    OLED_init();
+    // OLED_init();
 
-    test_OLED();
+    //test_OLED();
 
 
-    cursor_game();
+    // cursor_game();
 }

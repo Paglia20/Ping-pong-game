@@ -25,15 +25,29 @@ void cursor_game(void){
 void update_pixel(Pixel *p) {
     // Update bit based on joystick input
     update_position();
-    if (joystick.dir == UP && p->bit < 7) {
-        p->bit++;
-    } else if (joystick.dir == DOWN && p->bit > 0) {
-        p->bit--;
+
+    if (joystick.dir == UP){
+        if (p->bit == 7 && p->page < 7) {
+            p->bit = 0;
+            p->page++;
+        } else if (p->bit < 7) {
+            p->bit++;
+        }
+    } else if (joystick.dir == DOWN){
+        if (p->bit == 0 && p->page > 0) {
+            p->bit = 7;
+            p->page--;
+        } else if (p->bit > 0) {
+            p->bit--;
+        }
     } else if (joystick.dir == LEFT && p->col > 0) {
         p->col--;
     } else if (joystick.dir == RIGHT && p->col < 127) {
         p->col++;
     }
+    
+    print_joystick();
+
 }
 
 void render_pixel(Pixel p) {

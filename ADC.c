@@ -64,16 +64,20 @@ uint8_t * adc_read(){
     //START CONVERSION
     *adcVal = 0;
 
-    if (!wait_busy(0,10))  { printf("ADC busy timeout waiting for LOW\n"); } 
-    if (!wait_busy(1,50))  { printf("ADC busy timeout waiting for HIGH\n"); }
+    // if (!wait_busy(0,10))  { /*printf("ADC busy timeout waiting for LOW\n");*/ } 
+    // if (!wait_busy(1,50))  { /*printf("ADC busy timeout waiting for HIGH\n");*/ }
 
     //no busy
-    // _delay_us(8);  // ~7.3 µs @ 2.4576 MHz
+    _delay_us(8);  // ~7.3 µs @ 2.4576 MHz
 
 	
 	for (uint8_t i = 0; i < num_channels; i++) {
 		adcData[i] = *adcVal;
+        //printf(" val %d: %d\r\n", i, adcData[i]);
 	}
+
+
+
 	return adcData;
 }	
 

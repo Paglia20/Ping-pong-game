@@ -12,7 +12,5 @@ uint8_t SRAM_read(uint16_t address);
 
 void SRAM_test(void);
 
-void SRAM_test_with_wrappers(void);
-
 
 #endif // SRAM_H

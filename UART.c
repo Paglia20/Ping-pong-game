@@ -71,11 +71,9 @@ int uart_available(void) {
 }
 
 char uart_getc(void) {
-    while (!uart_available()) {
-        printf(""); // Wait for data to be available
-     }
+    while (!uart_available()) {; /* Wait for data to be available*/}
     char out = UDR0;
-    printf("Received char: %c\n", out); 
+    //printf("Received char: %c\n", out); 
 
     return out; // Return the received character
 }
