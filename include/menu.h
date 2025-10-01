@@ -6,9 +6,6 @@
 
 #define MENU_STR_LEN 20
 
-// ✅ Forward declaration only needed if recursive
-// typedef struct MenuItem MenuItem;  ← Not necessary here if we define full struct
-
 typedef struct MenuItem {
     bool active;
     char label[MENU_STR_LEN];

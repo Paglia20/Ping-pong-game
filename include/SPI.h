@@ -17,9 +17,6 @@
 #define DC_DDR  DDRD
 #define DC_PIN  PD2   
 
-#define JOY_B_PORT    PORTD
-#define JOY_B_DDR     DDRD
-#define JOY_B_PIN     PD3
 
 typedef enum {
     SPI_SLAVE_OLED = 0,

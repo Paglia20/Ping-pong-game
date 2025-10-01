@@ -9,8 +9,7 @@ void SPI_init(void) {
     // D/C output
     DC_DDR |= (1<<DC_PIN);
 
-    // JOY_B input
-    JOY_B_DDR &= ~(1<<JOY_B_PIN);
+ 
 
     // /CS come output e a riposo alto //port |= (1<<pin) 
     CS_OLED_DDR |= (1<<CS_OLED_PIN);

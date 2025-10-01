@@ -60,6 +60,9 @@ void calibrate(void) {
     uint8_t x, y;
     adc_read_avg(CALIBRATION_VALUE, &x, &y);
 
+    // JOY_B input
+    JOY_B_DDR &= ~(1<<JOY_B_PIN);
+
     joystick.x_zero = x;
     joystick.y_zero = y;
 }
@@ -91,6 +94,8 @@ static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc) {
 void update_position(void){
     uint8_t x, y;
     adc_read_avg(AVG_SAMPLES, &x, &y);
+
+    joystick.button_pressed = !(PIND & (1 << JOY_B_PIN));  // PIND
 
 	joystick.x_val = x;
     joystick.y_val = y;

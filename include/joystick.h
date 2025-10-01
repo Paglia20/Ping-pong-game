@@ -4,6 +4,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
+#define JOY_B_PORT    PORTD
+#define JOY_B_DDR     DDRD
+#define JOY_B_PIN     PD3
+
 // Joystick direction enum
 typedef enum Direction{
     UP,
