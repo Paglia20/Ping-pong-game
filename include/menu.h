@@ -1,21 +1,32 @@
-// menu.h
 #ifndef MENU_H
 #define MENU_H
 
-#include <stdbool.h>   // per il tipo bool
-#include <stdint.h>    // se ci servono tipi fissi (opzionale)
+#include <stdbool.h>
+#include <stdint.h>
 
-#define MENU_STR_LEN 20   // lunghezza massima per la stringa
+#define MENU_STR_LEN 20
 
-typedef struct {
-    bool active;                    // flag booleano
-    char label[MENU_STR_LEN];       // stringa fissa
-    MenuItem *sub;
+// ✅ Forward declaration only needed if recursive
+// typedef struct MenuItem MenuItem;  ← Not necessary here if we define full struct
+
+typedef struct MenuItem {
+    bool active;
+    char label[MENU_STR_LEN];
+    struct MenuItem* sub;  // ✅ correct: use struct MenuItem* here
 } MenuItem;
 
 typedef struct {
-    int page;                    // flag booleano
-    MenuItem* items;            // array di MenuItem
+    int page;
+    MenuItem* items;
 } Menu;
+
+// Function declarations
+void draw_menu(Menu* menu);
+void menu_navigation_up(void);
+void menu_navigation_down(void);
+void menu_select(void);
+void draw_submenu(MenuItem* subMenu);
+void execute_action(MenuItem* item);
+void menu_loop(void);
 
 #endif // MENU_H

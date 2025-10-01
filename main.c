@@ -21,6 +21,7 @@
 #include "include/SPI.h"
 #include "include/OLED.h"
 #include "include/cursor.h"
+#include "include/menu.h"
 
 
 void pulse_ALE(void)
@@ -171,14 +172,16 @@ int main(void)
     //test_joystick();
     // test_slider();
 
-    SPI_init();
+    //SPI_init();
 
-    OLED_init();
+    //OLED_init();
 
-    test_OLED();
+    //test_OLED();
 
 
-    cursor_game();
+    //cursor_game();
+
+    menu_init();
 
     return 0;   
 }
