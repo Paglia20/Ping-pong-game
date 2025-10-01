@@ -12,12 +12,32 @@
 
 #define DEADZONE 20   
 #define CALIBRATION_VALUE 5   
-#define AVG_SAMPLES 2
+#define AVG_SAMPLES 2 // to average out noise
 
 Joystick joystick;
 
 static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max);
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc);
+
+static inline void adc_read_avg(uint8_t samples, uint8_t *out_x, uint8_t *out_y) {
+    if (samples == 0) { // guard against /0
+        *out_x = 0;
+        *out_y = 0;
+        return;
+    }
+
+    uint16_t sx = 0, sy = 0;
+
+    // simple loop; 16-bit sums avoid overflow up to 255*255
+    for (uint8_t i = 0; i < samples; i++) {
+        uint8_t *d = adc_read();   // d[0] = x, d[1] = y
+        sx += d[0];
+        sy += d[1];
+    }
+
+    *out_x = (uint8_t)(sx / samples);
+    *out_y = (uint8_t)(sy / samples);
+}
 
 
 //for some reasons these two functions need to use printf_P to work properly
@@ -34,25 +54,11 @@ void print_zeros(void) {
 } 
 
 void calibrate(void) {
-    uint8_t all_data[CALIBRATION_VALUE * 2]; 
+    uint8_t x, y;
+    adc_read_avg(CALIBRATION_VALUE, &x, &y);
 
-    for (int i = 0; i < CALIBRATION_VALUE; i++) {
-        uint8_t *data = adc_read();  // assumes data[0] = x, data[1] = y
-        all_data[i * 2]     = data[0]; // x value
-        all_data[i * 2 + 1] = data[1]; // y value
-        printf("Calibration N %d...\r\n", i);
-    }
-
-    uint16_t x_sum = 0;
-    uint16_t y_sum = 0;
-
-    for (int i = 0; i < CALIBRATION_VALUE; i++) {
-        x_sum += all_data[i * 2];     // x values: 0, 2, 4, 6, 8
-        y_sum += all_data[i * 2 + 1]; // y values: 1, 3, 5, 7, 9
-    }
-
-    joystick.x_zero = x_sum / CALIBRATION_VALUE;
-    joystick.y_zero = y_sum / CALIBRATION_VALUE;
+    joystick.x_zero = x;
+    joystick.y_zero = y;
 }
 
 
@@ -80,24 +86,8 @@ static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc) {
 
 // Update joystick position and direction
 void update_position(void){
-    uint8_t all_data[AVG_SAMPLES * 2]; 
-
-    for (int i = 0; i < AVG_SAMPLES; i++) {
-        uint8_t *data = adc_read();  // assumes data[0] = x, data[1] = y
-        all_data[i * 2]     = data[0]; // x value
-        all_data[i * 2 + 1] = data[1]; // y value
-    }
-
-    uint16_t x_sum = 0;
-    uint16_t y_sum = 0;
     uint8_t x, y;
-
-    for (int i = 0; i < AVG_SAMPLES; i++) {
-        x_sum += all_data[i * 2];     
-        y_sum += all_data[i * 2 + 1]; 
-    }
-    x = x_sum / AVG_SAMPLES;
-    y = y_sum / AVG_SAMPLES;
+    adc_read_avg(AVG_SAMPLES, &x, &y);
 
 	joystick.x_val = x;
     joystick.y_val = y;
