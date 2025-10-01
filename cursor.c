@@ -7,91 +7,129 @@
 #include "include/joystick.h"
 
 static inline void write_byte(uint8_t page, uint8_t col, uint8_t value) {
-    oled_set_cursor(page, col);           // set page + column
-    oled_write_data(&value, 1);           // write exactly one byte
+    oled_set_cursor(page, col);
+    oled_write_data(&value, 1);
 }
 
-static inline void draw_dot(const Pixel* p) {
-    uint8_t mask = (uint8_t)(1u << p->bit);
-    write_byte(p->page, p->col, mask);
+
+static inline void write_two_bytes(uint8_t page, uint8_t col, uint8_t low, uint8_t high) {
+    oled_set_cursor(page, col);
+    oled_write_data(&low, 1);
+    oled_set_cursor((uint8_t)(page + 1), col);
+    oled_write_data(&high, 1);
 }
 
-static inline void erase_dot(const Pixel* p) {
-    write_byte(p->page, p->col, 0x00);
+static inline void draw_sprite8(const Sprite8* s) {
+    const uint8_t shift = s->bit & 7;
+
+    if (shift == 0) {
+        for (uint8_t dx = 0; dx < 8; ++dx) {
+            write_byte(s->page, (uint8_t)(s->col + dx), 0xFF);
+        }
+    } else {
+        const uint8_t low  = (uint8_t)(0xFFu << shift);         
+        const uint8_t high = (uint8_t)(0xFFu >> (8 - shift));   
+        for (uint8_t dx = 0; dx < 8; ++dx) {
+            write_two_bytes(s->page, (uint8_t)(s->col + dx), low, high);
+        }
+    }
 }
 
-static inline int pixels_equal(const Pixel* a, const Pixel* b) {
+static inline void erase_sprite8(const Sprite8* s) {
+    const uint8_t shift = s->bit & 7;
+
+    if (shift == 0) {
+        for (uint8_t dx = 0; dx < 8; ++dx) {
+            write_byte(s->page, (uint8_t)(s->col + dx), 0x00);
+        }
+    } else {
+        for (uint8_t dx = 0; dx < 8; ++dx) {
+            write_two_bytes(s->page, (uint8_t)(s->col + dx), 0x00, 0x00);
+        }
+    }
+}
+
+static inline int sprites_equal(const Sprite8* a, const Sprite8* b) {
     return (a->page == b->page) && (a->col == b->col) && (a->bit == b->bit);
 }
 
-static inline void clamp_pixel(Pixel* p) {
-    if (p->page > 7)   p->page = 7;
-    if (p->col  > 127) p->col  = 127;
-    if (p->bit  > 7)   p->bit  = 7;
+
+static inline void clamp_sprite(Sprite8* s) {
+    if (s->col > 120) s->col = 120;
+
+    if (s->bit == 0) {
+        if (s->page > 7) s->page = 7;
+    } else {
+        if (s->page > 6) s->page = 6; // serve spazio per la page+1
+    }
 }
 
-static void advance_pixel(Pixel* p, Direction dir) {
+static void advance_sprite(Sprite8* s, Direction dir) {
     if (dir == DOWN) {
-        if (p->bit == 7) { if (p->page < 7) { p->bit = 0; p->page++; } }
-        else p->bit++;
+        if (s->bit == 7) {
+            if (s->page < 7) { s->bit = 0; s->page++; }
+        } else {
+            s->bit++;
+        }
     } else if (dir == UP) {
-        if (p->bit == 0) { if (p->page > 0) { p->bit = 7; p->page--; } }
-        else p->bit--;
+        if (s->bit == 0) {
+            if (s->page > 0) { s->bit = 7; s->page--; }
+        } else {
+            s->bit--;
+        }
     } else if (dir == LEFT) {
-        if (p->col > 0) p->col--;
+        if (s->col > 0) s->col--;
     } else if (dir == RIGHT) {
-        if (p->col < 127) p->col++;
+        if (s->col < 120) s->col++;
     }
-    clamp_pixel(p);
+    clamp_sprite(s);
 }
+
+
 
 void cursor_game(void) {
     printf("Cursor game start!\r\n");
 
     SPI_init();
-    OLED_init();      // make sure your init sets page addressing mode
-    calibrate();      // joystick calibration
+    OLED_init();      
+    calibrate();      
 
-    OLED_fill_strips(); 
+    OLED_fill_strips();
     _delay_ms(1000);
 
-    oled_clear();     // clear once at start
+    oled_clear();
 
-    Pixel cur  = { .page = 0, .col = 0, .bit = 0 };
-    Pixel prev = cur;
+    Sprite8 cur  = { .page = 0, .col = 0, .bit = 0 };
+    Sprite8 prev = cur;
 
-    draw_dot(&cur);
+    draw_sprite8(&cur);
 
-    // test();
     while (1) {
-        update_position();                     
+        update_position();
         Direction d = joystick.dir;
 
         if (d != NEUTRAL) {
-            //printf("mooving pixel");
             prev = cur;
-            advance_pixel(&cur, d);
+            advance_sprite(&cur, d);
 
-            if (!pixels_equal(&prev, &cur)) {
-                //erase_dot(&prev);              
-                draw_dot(&cur);                
+            if (!sprites_equal(&prev, &cur)) {
+                erase_sprite8(&prev);
+                draw_sprite8(&cur);
             }
         }
 
-        print_joystick();
+        // debug opzionale
+        // print_joystick();
 
-        _delay_ms(10);                         
+        _delay_ms(10);
     }
 }
 
 void test (void){
     printf("Cursor test start!\r\n");
-    oled_set_cursor(3,40);
-    oled_write_data(0x08,1);
+    Sprite8 s = { .page = 3, .col = 40, .bit = 3 };
+    draw_sprite8(&s);
 
-    while (1)
-    {
-        _delay_ms(200);
-    }
-    
+    while (1) { _delay_ms(200); }
 }
+

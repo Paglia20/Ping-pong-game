@@ -171,14 +171,14 @@ int main(void)
     //test_joystick();
     // test_slider();
 
-    //  SPI_init();
+    SPI_init();
 
-    //  OLED_init();
+    OLED_init();
 
-    // test_OLED();
+    test_OLED();
 
 
     cursor_game();
-    
+
     return 0;   
 }

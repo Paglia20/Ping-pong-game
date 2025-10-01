@@ -85,7 +85,6 @@ void OLED_init(void){
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
-    oled_write_cmd2(0x20, 0x02); // page addressing
 
     _delay_ms(100);              
 
