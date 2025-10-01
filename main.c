@@ -89,7 +89,7 @@ void test_joystick(void)
 {
     calibrate();
 
-    printf("Joystick test start\r\n");
+    //printf("Joystick test start\r\n");
 
     print_zeros();
 
@@ -168,7 +168,7 @@ int main(void)
     adc_init();
 
     // test_adc();
-    test_joystick();
+    //test_joystick();
     // test_slider();
 
     // SPI_init();
@@ -178,5 +178,5 @@ int main(void)
     //test_OLED();
 
 
-    // cursor_game();
+    cursor_game();
 }

@@ -6,12 +6,19 @@
 #include <util/delay.h>
 
 void cursor_game(void){
+    printf("Cursor game start!\r\n");
+    SPI_init();
+    OLED_init();
+    
     calibrate();
 
     Pixel p;
     p.page = 0;
     p.col = 0;
     p.bit = 0;
+
+    OLED_fill_strips();
+    oled_clear();
 
     while (1)
     {
@@ -51,7 +58,7 @@ void update_pixel(Pixel *p) {
 }
 
 void render_pixel(Pixel p) {
-    oled_clear();
+    //oled_clear();
     oled_set_cursor((uint8_t)p.page, (uint8_t)p.col);
 
     uint8_t bitmask = (1 << p.bit);

@@ -10,8 +10,8 @@
 #include "include/bit_macros.h"
 #include "include/joystick.h"
 
-#define DEADZONE 20   
-#define CALIBRATION_VALUE 5   
+#define DEADZONE 30   
+#define CALIBRATION_VALUE 4   
 #define AVG_SAMPLES 2 // to average out noise
 
 Joystick joystick;
@@ -20,21 +20,17 @@ static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc);
 
 static inline void adc_read_avg(uint8_t samples, uint8_t *out_x, uint8_t *out_y) {
-    if (samples == 0) { // guard against /0
+    if (samples == 0) { 
         *out_x = 0;
         *out_y = 0;
         return;
     }
-
     uint16_t sx = 0, sy = 0;
-
-    // simple loop; 16-bit sums avoid overflow up to 255*255
     for (uint8_t i = 0; i < samples; i++) {
         uint8_t *d = adc_read();   // d[0] = x, d[1] = y
         sx += d[0];
         sy += d[1];
     }
-
     *out_x = (uint8_t)(sx / samples);
     *out_y = (uint8_t)(sy / samples);
 }
