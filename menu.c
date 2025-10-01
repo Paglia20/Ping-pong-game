@@ -1,22 +1,31 @@
 #include "include/OLED.h"
 #include "include/SPI.h"
 #include "include/menu.h"
-#include "include/joystick.h"  // ⬅ Needed for joystick.dir
+#include "include/joystick.h"  
+#include "include/cursor.h"
 #include <util/delay.h>
-#include <stdio.h> // For printf
+#include <stdio.h> 
 
-// === Global Menu ===
-// ⚠️ Define your menu items here (or in a separate file if preferred)
-MenuItem submenu_items[] = {
-    {true, "Sub Item 1", NULL},
-    {true, "Sub Item 2", NULL},
-    {true, "Back", NULL}
+
+void test_action(void);
+
+// Keep track of current and parent menu (for "Back")
+static Menu* currentMenu = NULL;
+static Menu  subMenuObj;      
+static Menu* parentMenu = NULL;
+static uint8_t selectedIndex = 0;
+
+
+MenuItem submenu_items[3] = {
+    {true, "Sub Item 1", NULL, test_action},
+    {true, "Sub Item 2", NULL, test_action},
+    {true, "Back",       NULL, back_action}
 };
 
-MenuItem main_menu_items[] = {
-    {true, "Start", NULL},
-    {true, "Settings", submenu_items},
-    {true, "About", NULL}
+MenuItem main_menu_items[3] = {
+    {true, "Start",    NULL, cursor_game},
+    {true, "Settings", submenu_items, NULL},
+    {true, "About",    NULL,  test_action}
 };
 
 Menu mainMenu = {
@@ -24,15 +33,13 @@ Menu mainMenu = {
     .items = main_menu_items
 };
 
-static uint8_t selectedIndex = 0;
-static Menu* currentMenu = &mainMenu;  // 🧠 Track which menu we're in
-
-// === INIT ===
 void menu_init(void){
     SPI_init();
     OLED_init();
-    calibrate();  // if joystick needs calibration
+    calibrate();  
 
+    currentMenu = &mainMenu;
+    selectedIndex = 0;
     draw_menu(currentMenu);
 
     while (1) {
@@ -46,26 +53,26 @@ void draw_menu(Menu* menu) {
 
     for (int i = 0; i < 3; i++) {
         if (menu->items[i].active) {
-            oled_set_cursor(i, 8);  // shift text to right (cursor at 0)
+            oled_set_cursor(i, 8); 
             oled_print(menu->items[i].label);
         }
     }
 
-    // Draw selector arrow ">"
     oled_set_cursor(selectedIndex, 0);
     oled_putchar('>');
 }
 
 // === SUBMENU DRAW ===
 void draw_submenu(MenuItem* subMenu) {
-    currentMenu = (Menu*)malloc(sizeof(Menu));
-    currentMenu->items = subMenu;
-    currentMenu->page = 0;
+    parentMenu = currentMenu;      // remember where we came from
+    subMenuObj.items = subMenu;    // wrap the raw items array into a Menu object
+    subMenuObj.page  = 0;
+
+    currentMenu = &subMenuObj;
     selectedIndex = 0;
     draw_menu(currentMenu);
 }
 
-// === EXECUTE ACTION ===
 void execute_action(MenuItem* item) {
     // Example: show the label temporarily
     oled_clear();
@@ -99,15 +106,22 @@ void menu_select(void) {
 
     if (selected_item->sub != NULL) {
         draw_submenu(selected_item->sub);
-    } else {
-        execute_action(selected_item);
+        return;
     }
+
+    if (selected_item->action) {
+        selected_item->action();   // run the callback
+        return;
+    }
+
+    // Fallback: generic action display
+    execute_action(selected_item);
 }
 
 
 // === MAIN LOOP ===
 void menu_loop(void) {
-    update_position(); // ⬅️ Update joystick status
+    update_joystick(); 
     Direction d = joystick.dir;
 
     if (d == UP) {
@@ -116,14 +130,35 @@ void menu_loop(void) {
         menu_navigation_down();
     }
 
-    if (joystick.button_pressed) {  // ⬅️ This assumes your struct has this field
+    if (joystick.button) { 
         menu_select();
 
-        // Wait for button release to prevent double-trigger
-        while (joystick.button_pressed) {
-            update_position();
+        while (joystick.button) {
+            update_joystick();
         }
     }
 
-    _delay_ms(120); // Debounce and limit update rate
+    _delay_ms(120);
+}
+
+
+void test_action(void){
+    oled_clear();
+    oled_set_cursor(3, 10);
+    oled_print("TEST ACTION..");
+    _delay_ms(800);
+    draw_menu(currentMenu);
+}
+
+
+void back_action(void){
+
+    if (parentMenu) {
+        currentMenu = parentMenu;
+        parentMenu = NULL;
+    } else {
+        currentMenu = &mainMenu;
+    }
+    selectedIndex = 0;
+    draw_menu(currentMenu);
 }

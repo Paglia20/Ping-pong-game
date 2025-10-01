@@ -91,11 +91,11 @@ static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc) {
 }
 
 // Update joystick position and direction
-void update_position(void){
+void update_joystick(void){
     uint8_t x, y;
     adc_read_avg(AVG_SAMPLES, &x, &y);
 
-    joystick.button_pressed = !(PIND & (1 << JOY_B_PIN));  // PIND
+    joystick.button = !(PIND & (1 << JOY_B_PIN));  // PIND
 
 	joystick.x_val = x;
     joystick.y_val = y;

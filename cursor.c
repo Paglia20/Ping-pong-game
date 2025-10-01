@@ -105,7 +105,7 @@ void cursor_game(void) {
     draw_sprite8(&cur);
 
     while (1) {
-        update_position();
+        update_joystick();
         Direction d = joystick.dir;
 
         if (d != NEUTRAL) {

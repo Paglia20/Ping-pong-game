@@ -27,7 +27,7 @@ typedef struct Joystick{
     volatile int16_t x_val_perc;
     volatile int16_t y_val_perc;
     volatile Direction dir;
-    volatile bool button_pressed;
+    volatile bool button;
 } Joystick;
 
 // External global variable defined in joystick.c
@@ -39,6 +39,6 @@ void print_zeros(void);
 
 void calibrate(void);
 
-void update_position(void);
+void update_joystick(void);
 
 #endif // JOYSTICK_H

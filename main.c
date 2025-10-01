@@ -96,7 +96,7 @@ void test_joystick(void)
 
     while (1)
     {
-        update_position();
+        update_joystick();
         print_joystick();
         _delay_ms(200);
     }
