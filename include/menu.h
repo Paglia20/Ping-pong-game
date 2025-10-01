@@ -10,6 +10,7 @@
 typedef struct {
     bool active;                    // flag booleano
     char label[MENU_STR_LEN];       // stringa fissa
+    MenuItem *sub;
 } MenuItem;
 
 typedef struct {
