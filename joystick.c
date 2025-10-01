@@ -10,9 +10,16 @@
 #include "include/bit_macros.h"
 #include "include/joystick.h"
 
-#define DEADZONE 30   
-#define CALIBRATION_VALUE 4   
+#define DEADZONE 20   
+#define CALIBRATION_VALUE 10   
 #define AVG_SAMPLES 2 // to average out noise
+
+//min and max x from testing
+//min and max y from testing
+#define X_MIN 68
+#define X_MAX 247
+#define Y_MIN 65
+#define Y_MAX 249
 
 Joystick joystick;
 
@@ -87,12 +94,12 @@ void update_position(void){
 
 	joystick.x_val = x;
     joystick.y_val = y;
-    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, 115, 255); //min and max x from testing
-    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, 115, 255); //min and max y from testing
+    joystick.x_val_perc  = percent_axis(x, joystick.x_zero, X_MIN, X_MAX); 
+    joystick.y_val_perc  = percent_axis(y, joystick.y_zero, Y_MIN, Y_MAX); 
 
     joystick.dir = dir_from_xy(joystick.x_val_perc, joystick.y_val_perc);
 
-	printf_P(PSTR("updated position\r\n"));
+	//printf_P(PSTR("updated position\r\n"));
 	
 }
 

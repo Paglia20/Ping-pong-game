@@ -14,7 +14,7 @@ typedef struct {
 
 typedef struct {
     int page;                    // flag booleano
-    ManuItem* items;            // array di MenuItem
+    MenuItem* items;            // array di MenuItem
 } Menu;
 
 #endif // MENU_H

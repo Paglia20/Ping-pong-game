@@ -27,16 +27,17 @@ static inline void set_page(uint8_t page){
 //Again the masks to not send bits outside the 4-bit fields.
 static inline void set_col(uint8_t col){
     cs_low(); dc_cmd();
-    SPI_txrx(0x10 | ((col >> 4) & 0x0F));      // 10 high nibble = bits [6:4]
     SPI_txrx(0x00 | (col & 0x0F));             // 00 low nibble = bits [3:0]
+    SPI_txrx(0x10 | ((col >> 4) & 0x0F));      // 10 high nibble = bits [6:4]
     cs_high();
 }
 
 static inline void set_col_page(uint8_t page, uint8_t col){
     cs_low(); dc_cmd();
     SPI_txrx(0xB0 | (page & 0x07));             
+    SPI_txrx(0x00 | (col & 0x0F));         
     SPI_txrx(0x10 | ((col >> 4) & 0x0F));       
-    SPI_txrx(0x00 | (col & 0x0F));              
+     
     cs_high();
 }
 
@@ -52,12 +53,6 @@ void oled_write_cmd2(uint8_t c, uint8_t a0){
     dc_cmd(); 
     SPI_txrx(c); 
     SPI_txrx(a0); 
-    cs_high();
-}
-void oled_write_cmd3(uint8_t c, uint8_t a0, uint8_t a1) {
-    cs_low(); 
-    dc_cmd(); 
-    SPI_txrx(c); SPI_txrx(a0); SPI_txrx(a1); 
     cs_high();
 }
 
@@ -90,6 +85,8 @@ void OLED_init(void){
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON
+    oled_write_cmd2(0x20, 0x02); // page addressing
+
     _delay_ms(100);              
 
     oled_clear();
@@ -180,8 +177,8 @@ void oled_clear_line(uint8_t page){
     cs_low();
     dc_cmd();
     SPI_txrx(0xB0 | (page & 0x07));   // set page
-    SPI_txrx(0x10 | 0x00);            // col high = 0ge to
     SPI_txrx(0x00 | 0x00);            // col low  = 0
+    SPI_txrx(0x10 | 0x00);            // col high = 0ge to
 
     dc_data();
     for (uint8_t x = 0; x < 128; x++) {
@@ -198,8 +195,9 @@ void oled_clear(void){
     for (uint8_t p = 0; p < 8; ++p){
         dc_cmd();
         SPI_txrx(0xB0 | (p & 0x07));  // set page
-        SPI_txrx(0x10 | 0x00);        // col high = 0
         SPI_txrx(0x00 | 0x00);        // col low  = 0
+        SPI_txrx(0x10 | 0x00);        // col high = 0
+
 
         dc_data();
         for (uint8_t x = 0; x < 128; ++x){

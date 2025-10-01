@@ -64,11 +64,11 @@ uint8_t * adc_read(){
     //START CONVERSION
     *adcVal = 0;
 
-    // if (!wait_busy(0,10))  { /*printf("ADC busy timeout waiting for LOW\n");*/ } 
-    // if (!wait_busy(1,50))  { /*printf("ADC busy timeout waiting for HIGH\n");*/ }
+    if (!wait_busy(0,10))  { /*printf("ADC busy timeout waiting for LOW\n");*/ } 
+    if (!wait_busy(1,50))  { /*printf("ADC busy timeout waiting for HIGH\n");*/ }
 
     //no busy
-    _delay_us(8);  // ~7.3 µs @ 2.4576 MHz
+    //_delay_us(8);  // ~7.3 µs @ 2.4576 MHz
 
 	
 	for (uint8_t i = 0; i < num_channels; i++) {
@@ -83,7 +83,6 @@ uint8_t * adc_read(){
 
 
 
-//note per domani
-
-
-//quando leggi un array, quindi un pointer, ti basta poi fare *p o *(p+1)
+//note 
+// external ref
+// busy not working

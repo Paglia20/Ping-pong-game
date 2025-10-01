@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <util/delay.h>
+
 #include "include/OLED.h"
 #include "include/SPI.h"
 #include "include/cursor.h"
@@ -30,10 +31,10 @@ static inline void clamp_pixel(Pixel* p) {
 }
 
 static void advance_pixel(Pixel* p, Direction dir) {
-    if (dir == UP) {
+    if (dir == DOWN) {
         if (p->bit == 7) { if (p->page < 7) { p->bit = 0; p->page++; } }
         else p->bit++;
-    } else if (dir == DOWN) {
+    } else if (dir == UP) {
         if (p->bit == 0) { if (p->page > 0) { p->bit = 7; p->page--; } }
         else p->bit--;
     } else if (dir == LEFT) {
@@ -51,29 +52,46 @@ void cursor_game(void) {
     OLED_init();      // make sure your init sets page addressing mode
     calibrate();      // joystick calibration
 
+    OLED_fill_strips(); 
+    _delay_ms(1000);
+
     oled_clear();     // clear once at start
 
     Pixel cur  = { .page = 0, .col = 0, .bit = 0 };
     Pixel prev = cur;
+
     draw_dot(&cur);
 
+    // test();
     while (1) {
-        update_position();                     // updates global joystick.dir
+        update_position();                     
         Direction d = joystick.dir;
 
         if (d != NEUTRAL) {
+            //printf("mooving pixel");
             prev = cur;
             advance_pixel(&cur, d);
 
             if (!pixels_equal(&prev, &cur)) {
-                erase_dot(&prev);              // clear old location (one byte)
-                draw_dot(&cur);                // draw new location (one byte)
+                //erase_dot(&prev);              
+                draw_dot(&cur);                
             }
         }
 
-        // Optional: debug
-        // print_joystick();
+        print_joystick();
 
-        _delay_ms(10);                         // small, smooth cadence
+        _delay_ms(10);                         
     }
+}
+
+void test (void){
+    printf("Cursor test start!\r\n");
+    oled_set_cursor(3,40);
+    oled_write_data(0x08,1);
+
+    while (1)
+    {
+        _delay_ms(200);
+    }
+    
 }

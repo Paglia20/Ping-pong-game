@@ -27,15 +27,15 @@ static void burst_range(uint16_t start, uint16_t end) {
 void dec_test(void){
 
     // 1) ADC region 
-    printf("Testing memory region ADC\n");
+    //printf("Testing memory region ADC\n");
     burst_range(0x1000, 0x17FF);
-    printf("ADC test done\n");
+    //printf("ADC test done\n");
 
     // 3) SRAM region 
-    printf("Testing memory region SRAM\n");
+    //printf("Testing memory region SRAM\n");
 
     burst_range(0x1800, 0x1FFF);
-    printf("SRAM test done\n");
+    //printf("SRAM test done\n");
 
     _delay_ms(300);
 }

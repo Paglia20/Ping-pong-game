@@ -27,4 +27,10 @@ void oled_print(const char *s);
 void oled_clear_line(uint8_t page);
 void oled_clear(void);
 
+static inline void cs_low(void);
+static inline void cs_high(void);
+
+static inline void dc_cmd(void);
+static inline void dc_data(void);
+
 #endif // OLED_H
