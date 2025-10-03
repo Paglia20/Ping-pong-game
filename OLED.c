@@ -90,7 +90,6 @@ void OLED_init(void){
 
     oled_clear();
     oled_home();
-    
 }
 
 void OLED_fill_strips (void){         
@@ -177,7 +176,7 @@ void oled_clear_line(uint8_t page){
     dc_cmd();
     SPI_txrx(0xB0 | (page & 0x07));   // set page
     SPI_txrx(0x00 | 0x00);            // col low  = 0
-    SPI_txrx(0x10 | 0x00);            // col high = 0ge to
+    SPI_txrx(0x10 | 0x00);            // col high = 0
 
     dc_data();
     for (uint8_t x = 0; x < 128; x++) {

@@ -3,11 +3,17 @@
 #include "include/menu.h"
 #include "include/joystick.h"  
 #include "include/cursor.h"
+#include "include/board.h"
 #include <util/delay.h>
 #include <stdio.h> 
 
+int run = 1;
+BoardButtons board;
 
 void test_action(void);
+void back_action(void);
+void power_off(void);
+void test_avr(void);
 
 // Keep track of current and parent menu (for "Back")
 static Menu* currentMenu = NULL;
@@ -17,32 +23,35 @@ static uint8_t selectedIndex = 0;
 
 
 MenuItem submenu_items[3] = {
-    {true, "Sub Item 1", NULL, test_action},
-    {true, "Sub Item 2", NULL, test_action},
+    {true, "Calibrate", NULL, calibrate},
+    {true, "Test AVR", NULL, test_avr},
     {true, "Back",       NULL, back_action}
 };
 
-MenuItem main_menu_items[3] = {
+MenuItem main_menu_items[4] = {
     {true, "Start",    NULL, cursor_game},
-    {true, "Settings", submenu_items, NULL},
-    {true, "About",    NULL,  test_action}
+    {true, "Settings & Tests", submenu_items, NULL},
+    {true, "About",    NULL,  test_action},
+    {true, "Power OFF",    NULL,  power_off}
 };
 
 Menu mainMenu = {
-    .page = 0,
+    .count = sizeof(main_menu_items) / sizeof(main_menu_items[0]),
     .items = main_menu_items
 };
 
 void menu_init(void){
     SPI_init();
     OLED_init();
+    board = board_init();
+
     calibrate();  
 
     currentMenu = &mainMenu;
     selectedIndex = 0;
     draw_menu(currentMenu);
 
-    while (1) {
+    while (run) {
         menu_loop();
     }
 }
@@ -51,7 +60,7 @@ void menu_init(void){
 void draw_menu(Menu* menu) {
     oled_clear();
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < menu->count; i++) {
         if (menu->items[i].active) {
             oled_set_cursor(i, 8); 
             oled_print(menu->items[i].label);
@@ -64,9 +73,9 @@ void draw_menu(Menu* menu) {
 
 // === SUBMENU DRAW ===
 void draw_submenu(MenuItem* subMenu) {
-    parentMenu = currentMenu;      // remember where we came from
-    subMenuObj.items = subMenu;    // wrap the raw items array into a Menu object
-    subMenuObj.page  = 0;
+    parentMenu = currentMenu;     
+    subMenuObj.items = subMenu;   
+    subMenuObj.count  = sizeof(submenu_items) / sizeof(submenu_items[0]);
 
     currentMenu = &subMenuObj;
     selectedIndex = 0;
@@ -74,7 +83,6 @@ void draw_submenu(MenuItem* subMenu) {
 }
 
 void execute_action(MenuItem* item) {
-    // Example: show the label temporarily
     oled_clear();
     oled_set_cursor(3, 10);
     oled_print("Selected:");
@@ -94,7 +102,7 @@ void menu_navigation_up(void) {
 }
 
 void menu_navigation_down(void) {
-    if (selectedIndex < 2) {  // You can make this dynamic later
+    if (selectedIndex < (currentMenu->count - 1)) {  
         selectedIndex++;
         draw_menu(currentMenu);
     }
@@ -152,7 +160,6 @@ void test_action(void){
 
 
 void back_action(void){
-
     if (parentMenu) {
         currentMenu = parentMenu;
         parentMenu = NULL;
@@ -162,3 +169,45 @@ void back_action(void){
     selectedIndex = 0;
     draw_menu(currentMenu);
 }
+
+void power_off(void){
+    currentMenu = &mainMenu;
+    selectedIndex = 0;
+    run = 0;
+}
+
+void test_avr(void){
+    oled_clear();
+    oled_set_cursor(2, 0);
+    oled_print("Press any button.. (R1 to exit)");
+    int test = 1;
+    
+    while (test) {
+        oled_set_cursor(3, 0);
+        oled_print("Last pressed:");
+
+        if (board_read_buttons(&board)) {
+            if (board_buttons_any(&board)) {
+                oled_clear_line(3);
+                oled_print("Last pressed:");
+
+                if (board.Btn)   oled_print("NAV btn");
+                if (board.Up)    oled_print("NAV up");
+                if (board.Down)  oled_print("NAV down");
+                if (board.Left)  oled_print("NAV left");
+                if (board.Right) oled_print("NAV right");
+                if (board.L1)    {oled_print("L1"); board_set_led(0, true);}                //test turn on led from menu
+                if (board.L2)    {oled_print("L2"); board_set_led(0, false);}
+
+                if (board.R1)    {test = 0;}
+            }
+        }
+
+        //not sure if the behaviour will be correct
+        _delay_ms(10);
+    }
+
+    draw_menu(currentMenu);
+
+}
+

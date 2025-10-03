@@ -11,24 +11,16 @@ typedef void (*MenuAction)(void);
 typedef struct MenuItem {
     bool active;
     char label[MENU_STR_LEN];
-    struct MenuItem* sub;   // pointer to submenu items array (or NULL)
+    struct MenuItem* sub;  
     MenuAction action;      
 } MenuItem;
 
 typedef struct {
-    int page;
+    uint8_t count;
     MenuItem* items;
 } Menu;
 
-// Function declarations
-void draw_menu(Menu* menu);
-void menu_navigation_up(void);
-void menu_navigation_down(void);
-void menu_select(void);
-void draw_submenu(MenuItem* subMenu);
-void execute_action(MenuItem* item);
+void menu_init(void);
 void menu_loop(void);
-void test_action(void);
-void back_action(void);
 
 #endif // MENU_H
