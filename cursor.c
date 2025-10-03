@@ -88,7 +88,7 @@ static void advance_sprite(Sprite8* s, Direction dir) {
 
 
 void cursor_game(void) {
-    printf("Cursor game start!\r\n");
+    //printf("Cursor game start!\r\n");
 
     SPI_init();
     OLED_init();      
@@ -126,7 +126,7 @@ void cursor_game(void) {
 }
 
 void test (void){
-    printf("Cursor test start!\r\n");
+    //printf("Cursor test start!\r\n");
     Sprite8 s = { .page = 3, .col = 40, .bit = 3 };
     draw_sprite8(&s);
 

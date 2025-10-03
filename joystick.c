@@ -57,6 +57,7 @@ void print_zeros(void) {
 } 
 
 void calibrate(void) {
+    printf("Calibrating joystick\r\n");
     uint8_t x, y;
     adc_read_avg(CALIBRATION_VALUE, &x, &y);
 

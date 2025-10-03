@@ -23,7 +23,7 @@ int SRAM_write(uint16_t address, char data){
         return 0;
 		
 	}
-    printf("Trying to write a too big address\n");
+    //printf("Trying to write a too big address\n");
 	return EXIT_FAILURE;
 }
 
@@ -31,7 +31,7 @@ uint8_t SRAM_read(uint16_t address){
     if (address <= 0x7FF){
         return ext_ram[address];
     }
-    printf("Trying to read a too big address\n");
+    //printf("Trying to read a too big address\n");
     return EXIT_FAILURE;
 }
 

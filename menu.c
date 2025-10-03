@@ -31,7 +31,7 @@ MenuItem submenu_items[3] = {
 MenuItem main_menu_items[4] = {
     {true, "Start",    NULL, cursor_game},
     {true, "Settings & Tests", submenu_items, NULL},
-    {true, "About",    NULL,  test_action},
+    {true, "About",    NULL,  read_info},
     {true, "Power OFF",    NULL,  power_off}
 };
 
@@ -174,12 +174,13 @@ void power_off(void){
     currentMenu = &mainMenu;
     selectedIndex = 0;
     run = 0;
+    oled_clear();
 }
 
 void test_avr(void){
     oled_clear();
     oled_set_cursor(2, 0);
-    oled_print("Press any button.. (R1 to exit)");
+    oled_print("Press any button (R1 to exit)");
     int test = 1;
     
     while (test) {

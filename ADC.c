@@ -84,5 +84,3 @@ uint8_t * adc_read(){
 
 
 //note 
-// external ref
-// busy not working

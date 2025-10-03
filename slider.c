@@ -57,7 +57,7 @@ void update_slider(void){
 	slider.x_val = x;
     slider.x_val_perc  = percent_axis(x, slider.x_zero, 0, 255);
 
-	printf_P(PSTR("updated position slider\r\n"));
+	//printf_P(PSTR("updated position slider\r\n"));
 	
 }
 
