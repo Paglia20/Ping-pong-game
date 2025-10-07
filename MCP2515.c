@@ -86,9 +86,10 @@ uint8_t MCP_read_status(void) {
 void MCP_set_mode(uint8_t mode) {
     MCP_bit_modify(MCP_CANCTRL, MODE_MASK, mode);
     
-    // while ((MCP_read(MCP_CANSTAT) & MODE_MASK) != mode){
+    //while ((MCP_read(MCP_CANSTAT) & MODE_MASK) != mode){}; // wait until mode is set
+    //uint8_t current_mode = MCP_read(MCP_CANSTAT) & MODE_MASK;
+    //printf("Current mode: 0x%02X, Desired mode: 0x%02X\n", current_mode, mode);
 
-    // }; // wait until mode is set
 
     //look into this
 }

@@ -154,12 +154,13 @@ void test_loop(void){
 
     // --- inizializza CAN in loopback mode ---
     CAN_init_loopback_125k_4M9();
-    printf("Setted to loop...\n");
 
     // --- abilita interrupt su INT2 (PD2) ---
+    GIFR |= (1 << INT2);    //Clear INT2 interrupt flag
     MCUCSR &= ~(1 << ISC2);   // fronte di discesa
     GICR   |=  (1 << INT2);   // abilita INT2
     sei();                    // abilita interrupt globali
+    // |---> sei() fa tornare in cima al loop
 
     // for some readon loop here???
 
