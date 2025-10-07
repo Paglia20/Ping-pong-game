@@ -150,16 +150,20 @@ void test_OLED(void){
 }
 
 void test_loop(void){
-    printf("MCP2515 loopback test start...\n");
+    printf("MCP2515 loopback  start...\n");
 
     // --- inizializza CAN in loopback mode ---
     CAN_init_loopback_125k_4M9();
+    printf("Setted to loop...\n");
 
     // --- abilita interrupt su INT2 (PD2) ---
     MCUCSR &= ~(1 << ISC2);   // fronte di discesa
     GICR   |=  (1 << INT2);   // abilita INT2
     sei();                    // abilita interrupt globali
 
+    // for some readon loop here???
+
+    
     // --- frame di test ---
     CanFrame tx = {
         .id  = 0x123,
@@ -221,7 +225,9 @@ int main(void)
 
     //cursor_game();
 
-    menu_init();
+    //menu_init();
+
+    test_loop();
 
     return 0;   
 }

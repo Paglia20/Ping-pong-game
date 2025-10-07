@@ -30,7 +30,6 @@ bool CAN_send(const CanFrame* f);
 // receive one frame from RXB0 (returns false if nothing)
 bool CAN_receive(CanFrame* out);
 
-// opzionale: da chiamare nella tua ISR sul pin INT (se usi gli interrupt)
-void CAN_isr(void (*on_rx)(void), void (*on_tx)(void));
+
 
 

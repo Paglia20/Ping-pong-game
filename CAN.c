@@ -37,6 +37,7 @@ void CAN_init_loopback_125k_4M9(void)
 
     // Loopback mode: il frame TX rientra in RX
     MCP_set_mode(MODE_LOOPBACK);
+
 }
 
 // ---- TX: carica TXB0 e invia ----
@@ -90,13 +91,13 @@ ISR(INT1_vect)
 {
     uint8_t flags = MCP_get_interrupt_flags();
 
-    if (flags & MCP_RX0IF) { //perchè? 
+    if (flags & MCP_RX0IF) { //perchè?  MCP_RX0IF
         CanFrame f;
 
         CAN_receive(&f);
 
         // Example: debug / handle the frame
-        printf("ISR RX id=%03X len=%u d0=%u\n", f.id, f.dlc, f.data[0]);
+        //printf("ISR RX id=%03X len=%u d0=%u\n", f.id, f.dlc, f.data[0]);
     }
 
     if (flags & MCP_TX0IF) {

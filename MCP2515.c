@@ -24,8 +24,11 @@ void MCP_init(void) {
     
     CONTR_CS_DDR  |=  (1 << CONTR_CS_PIN);   // CS output
     CONTR_INT_DDR  &= ~(1 << CONTR_INT_PIN);  // INT input
-    cs_high();                           
+    cs_high();   
+                        
     CONTR_INT_PORT |=  (1 << CONTR_INT_PIN);  // pull-up su INT
+
+
 
 }
 
@@ -83,7 +86,11 @@ uint8_t MCP_read_status(void) {
 void MCP_set_mode(uint8_t mode) {
     MCP_bit_modify(MCP_CANCTRL, MODE_MASK, mode);
     
-    while ((MCP_read(MCP_CANSTAT) & MODE_MASK) != mode); // wait until mode is set
+    // while ((MCP_read(MCP_CANSTAT) & MODE_MASK) != mode){
+
+    // }; // wait until mode is set
+
+    //look into this
 }
 
 void MCP_enable_interrupts(uint8_t mask) {
