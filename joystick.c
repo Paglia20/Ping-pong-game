@@ -134,7 +134,7 @@ void update_joystick(void){
     uint8_t x, y;
     adc_read_avg(AVG_SAMPLES, &x, &y);
 
-    joystick.button = !(PIND & (1 << JOY_B_PIN));  // PIND
+    joystick.button = !(PINB & (1 << JOY_B_PIN));  // PINB
 
 	joystick.x_val = x;
     joystick.y_val = y;

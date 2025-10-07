@@ -3,8 +3,8 @@
 #include "include/bit_macros.h"
 
 // ---- GPIO (CS=PB2, INT=PB3) ----
-static inline void cs_low(void)  { CONTR_PORT &= ~(1 << CONTR_CS_PIN); }
-static inline void cs_high(void) { CONTR_PORT |=  (1 << CONTR_CS_PIN); }
+static inline void cs_low(void)  { CONTR_CS_PORT &= ~(1 << CONTR_CS_PIN); }
+static inline void cs_high(void) { CONTR_CS_PORT |=  (1 << CONTR_CS_PIN); }
 
 
 void MCP_init(void) {
@@ -13,19 +13,19 @@ void MCP_init(void) {
 
     uint8_t value;
 
-    // Self - test
-    value = MCP_read( MCP_CANSTAT) ;
-    if (( value & MODE_MASK ) != MODE_CONFIG ) {
-        if (DEBUG){
-            printf("MCP2515 is NOT in configuration mode after reset !\n");
-        }
-    return;
-    }
+    // // Self - test
+    // value = MCP_read( MCP_CANSTAT) ;
+    // if (( value & MODE_MASK ) != MODE_CONFIG ) {
+    //     if (DEBUG){
+    //         printf("MCP2515 is NOT in configuration mode after reset !\n");
+    //     }
+    // return;
+    // }
     
-    CONTR_DDR  |=  (1 << CONTR_CS_PIN);   // CS output
-    CONTR_DDR  &= ~(1 << CONTR_INT_PIN);  // INT input
+    CONTR_CS_DDR  |=  (1 << CONTR_CS_PIN);   // CS output
+    CONTR_INT_DDR  &= ~(1 << CONTR_INT_PIN);  // INT input
     cs_high();                           
-    CONTR_PORT |=  (1 << CONTR_INT_PIN);  // pull-up su INT
+    CONTR_INT_PORT |=  (1 << CONTR_INT_PIN);  // pull-up su INT
 
 }
 
