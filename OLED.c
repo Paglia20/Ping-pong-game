@@ -81,7 +81,7 @@ void OLED_init(void){
     oled_write_cmd2(0x20, 0x02); // page addressing
 
     oled_write_cmd2(0xDB, 0x34);           // VCOMH
-    oled_write_cmd2(0xAD, 0x00);           // master cfg
+    //oled_write_cmd2(0xAD, 0x00);           // master cfg          with this on it gives artifacts
     oled_write_cmd1(0xA4);                 // follow RAM
     oled_write_cmd1(0xA6);                 // normal
     oled_write_cmd1(0xAF);                 // ON

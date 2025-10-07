@@ -1,5 +1,6 @@
 #include "include/MCP2515.h"
 #include "include/SPI.h"    // usa la tua SPI_txrx() e SPI_select/deselect()
+#include "include/bit_macros.h"
 
 // ---- GPIO (CS=PB2, INT=PB3) ----
 static inline void cs_low(void)  { CONTR_PORT &= ~(1 << CONTR_CS_PIN); }
@@ -7,12 +8,25 @@ static inline void cs_high(void) { CONTR_PORT |=  (1 << CONTR_CS_PIN); }
 
 
 void MCP_init(void) {
+    SPI_init();
+    MCP_reset();
+
+    uint8_t value;
+
+    // Self - test
+    value = MCP_read( MCP_CANSTAT) ;
+    if (( value & MODE_MASK ) != MODE_CONFIG ) {
+        if (DEBUG){
+            printf("MCP2515 is NOT in configuration mode after reset !\n");
+        }
+    return;
+    }
+    
     CONTR_DDR  |=  (1 << CONTR_CS_PIN);   // CS output
     CONTR_DDR  &= ~(1 << CONTR_INT_PIN);  // INT input
     cs_high();                           
     CONTR_PORT |=  (1 << CONTR_INT_PIN);  // pull-up su INT
 
-    //ma quindi non devo fare mode configuration e settare altro?
 }
 
 
