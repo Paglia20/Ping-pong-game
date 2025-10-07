@@ -1,0 +1,108 @@
+#include "include/MCP2515.h"
+#include "include/SPI.h"
+#include "include/CAN.h"
+
+// helper: codifica/decodifica Standard ID (11 bit)
+static inline void id_to_regs(uint16_t id, uint8_t* sidh, uint8_t* sidl) {
+    *sidh = (uint8_t)(id >> 3);
+    *sidl = (uint8_t)((id & 0x07) << 5);   // standard frame, no extended
+}
+static inline uint16_t regs_to_id(uint8_t sidh, uint8_t sidl) {
+    return (uint16_t)((sidh << 3) | (sidl >> 5));
+}
+
+// ---- Init: loopback ~125 kbps con Fosc=4.9 MHz ----
+void CAN_init_loopback_125k_4M9(void)
+{
+    MCP_init();                 // prepara CS/INT GPIO
+    MCP_reset();
+    MCP_set_mode(MODE_CONFIG);  // i CNF si scrivono solo in config
+
+    // Bit-timing per ~122.5 kbps (20 TQ, SJW=1TQ)
+    // TQ = 2*(BRP+1)/Fosc -> BRP=0 -> TQ≈408ns; 20*TQ≈8.16us => 122.5 kbps
+    MCP_write(MCP_CNF1, 0x00);  // SJW=00 (1TQ), BRP=000000
+    MCP_write(MCP_CNF2, 0xAF);  // BTLMODE=1, SAM=0, PHSEG1=5 (PS1=6), PRSEG=7 (Prop=8)
+    MCP_write(MCP_CNF3, 0x04);  // PHSEG2=4 (PS2=5)
+
+    // Accetta tutto su entrambe le RX
+    MCP_write(MCP_RXB0CTRL, 0x60); 
+    MCP_write(MCP_RXB1CTRL, 0x60);
+
+    // Abilita interrupt su RX0 e TX0
+    MCP_enable_interrupts(MCP_RX_INT);
+    MCP_enable_interrupts(MCP_TX_INT);
+
+    // Pulisci eventuali flag pendenti
+    MCP_clear_interrupt_flags(0xFF);
+
+    // Loopback mode: il frame TX rientra in RX
+    MCP_set_mode(MODE_LOOPBACK);
+}
+
+// ---- TX: carica TXB0 e invia ----
+bool CAN_send(const CanFrame* f)
+{
+    if (!f || f->dlc > 8) return false;
+
+    uint8_t sidh, sidl;
+    id_to_regs(f->id, &sidh, &sidl);
+
+    MCP_write(TXB0SIDH, sidh);
+    MCP_write(TXB0SIDL, sidl);
+    MCP_write(TXB0DLC,  f->dlc & 0x0F);
+
+    for (uint8_t i = 0; i < f->dlc; i++) {
+        MCP_write((uint8_t)(TXB0D0 + i), f->data[i]);
+    }
+
+    // Richiedi la trasmissione del buffer 0
+    MCP_rts(0);  
+    return true;
+}
+
+// ---- RX: preleva un frame da RXB0 se presente ----
+bool CAN_receive(CanFrame* out)
+{
+    if (!out) return false;
+
+    // doppio controllo su flag RX0IF 
+    uint8_t flags = MCP_get_interrupt_flags();
+    if (!(flags & MCP_RX0IF))
+        return false;
+
+    uint8_t sidh = MCP_read(RXB0SIDH);
+    uint8_t sidl = MCP_read(RXB0SIDL);
+    out->id  = regs_to_id(sidh, sidl);
+
+    uint8_t dlc = MCP_read(RXB0DLC) & 0x0F;
+    out->dlc = dlc;
+
+    for (uint8_t i = 0; i < dlc; i++) {
+        out->data[i] = MCP_read((uint8_t)(RXB0D0 + i));
+    }
+
+    // Pulisci il flag RX0IF (INT torna alto se non ci sono altri flag)
+    MCP_clear_interrupt_flags(MCP_RX0IF);
+    return true;
+}
+
+ISR(INT1_vect)
+{
+    uint8_t flags = MCP_get_interrupt_flags();
+
+    if (flags & MCP_RX0IF) { //perchè? 
+        CanFrame f;
+
+        CAN_receive(&f);
+
+        // Example: debug / handle the frame
+        printf("ISR RX id=%03X len=%u d0=%u\n", f.id, f.dlc, f.data[0]);
+    }
+
+    if (flags & MCP_TX0IF) {
+        MCP_clear_interrupt_flags(MCP_TX0IF);
+        // printf transmission complete 
+    }
+
+    // other flags 
+}

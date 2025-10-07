@@ -160,6 +160,18 @@
 #define MCP_WAKIF		0x40
 #define MCP_MERRF		0x80
 
+void MCP_init(void);
+void MCP_reset(void);
+uint8_t MCP_read(uint8_t addr);
+void MCP_write(uint8_t addr, uint8_t data);
+void MCP_bit_modify(uint8_t addr, uint8_t mask, uint8_t data);
+void MCP_rts(uint8_t buffer_index);
+uint8_t MCP_get_interrupt_flags(void);
+void MCP_clear_interrupt_flags(uint8_t mask);
+void MCP_set_mode(uint8_t mode);
+void MCP_enable_interrupts(uint8_t mask);
+uint8_t MCP_read_status(void);
+
 
 
 #endif

@@ -22,6 +22,9 @@
 #include "include/OLED.h"
 #include "include/cursor.h"
 #include "include/menu.h"
+#include "include/CAN.h"
+#include "include/MCP2515.h"
+#include <avr/interrupt.h>
 
 
 void pulse_ALE(void)
@@ -144,6 +147,41 @@ void test_OLED(void){
 
     // oled_clear();
     // oled_home();
+}
+
+void test_loop(void){
+    printf("MCP2515 loopback test start...\n");
+
+    // --- inizializza CAN in loopback mode ---
+    CAN_init_loopback_125k_4M9();
+
+    // --- abilita interrupt su INT2 (PD2) ---
+    MCUCSR &= ~(1 << ISC2);   // fronte di discesa
+    GICR   |=  (1 << INT2);   // abilita INT2
+    sei();                    // abilita interrupt globali
+
+    // --- frame di test ---
+    CanFrame tx = {
+        .id  = 0x123,
+        .dlc = 3,
+        .data = { 0x11, 0x22, 0x33 }
+    };
+
+    printf("Sending CAN frame...\n");
+    CAN_send(&tx);
+
+    // --- in loopback il frame ritorna in RX subito ---
+    CanFrame rx;
+    while (!CAN_receive(&rx)) {
+        // busy-wait
+    }
+
+    printf("Received frame!\n");
+    printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
+    for (uint8_t i = 0; i < rx.dlc; i++)
+        printf(" %02X", rx.data[i]);
+    printf("\n");
+
 }
 
 int main(void)
