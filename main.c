@@ -79,8 +79,8 @@ void test_adc(void)
     {
         uint8_t *values = adc_read(); // CH0..CH3
 
-        printf("X =%3u  Y =%3u  SLIDER =%3u",
-               values[0], values[1], values[2]);
+        // printf("X =%3u  Y =%3u  SLIDER =%3u",
+        //        values[0], values[1], values[2]);
 
         _delay_ms(200);
     }

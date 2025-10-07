@@ -18,13 +18,13 @@ static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8
 
 //for some reasons these two functions need to use printf_P to work properly
 void print_slider(void) { 
-	printf_P(PSTR("Slider X: %d (%d%%)\r\n"), 
-        slider.x_val, slider.x_val_perc);
+	// printf_P(PSTR("Slider X: %d (%d%%)\r\n"), 
+    //     slider.x_val, slider.x_val_perc);
 } 
 
 void print_slider_zeros(void) { 
-	printf_P(PSTR("X0: (%d)\r\n"), 
-        slider.x_zero); 
+	// printf_P(PSTR("X0: (%d)\r\n"), 
+    //     slider.x_zero); 
 } 
 
 void calibrate_slider(void) {

@@ -1,6 +1,8 @@
 #include <avr/io.h>
 #include <stddef.h>  
 #include <stdio.h>
+#include <avr/pgmspace.h>
+
 
 
 #include "include/UART.h"
@@ -78,4 +80,12 @@ char uart_getc(void) {
     return out; // Return the received character
 }
 
+
+
+void uart_puts_P(const char *progmem_s) {
+    char c;
+    while ((c = pgm_read_byte(progmem_s++))) {
+        uart_putc(c);
+    }
+}
 

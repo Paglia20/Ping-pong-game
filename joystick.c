@@ -43,21 +43,53 @@ static inline void adc_read_avg(uint8_t samples, uint8_t *out_x, uint8_t *out_y)
 }
 
 
-//for some reasons these two functions need to use printf_P to work properly
-void print_joystick(void) { 
-	printf_P(PSTR("X: %d (%d%%) | Y: %d (%d%%) | Dir: %S\r\n"), 
-        joystick.x_val, joystick.x_val_perc, joystick.y_val, joystick.y_val_perc,
-        (joystick.dir == UP) ? PSTR("UP") : (joystick.dir == DOWN) ? PSTR("DOWN") : (joystick.dir == LEFT) ? PSTR("LEFT") : (joystick.dir == RIGHT) ? PSTR("RIGHT") : PSTR("NEUTRAL"));
-	
-} 
+//uses uart_puts_p
+void print_joystick(void) {
+    char buf[8];
 
-void print_zeros(void) { 
-	printf_P(PSTR("X0: (%d) | Y0: (%d)\r\n"), 
-        joystick.x_zero, joystick.y_zero); 
-} 
+    uart_puts_P(PSTR("X: "));
+    itoa(joystick.x_val, buf, 10);
+    uart_puts(buf);
+
+    uart_puts_P(PSTR(" ("));
+    itoa(joystick.x_val_perc, buf, 10);
+    uart_puts(buf);
+    uart_puts_P(PSTR("%) | Y: "));
+
+    itoa(joystick.y_val, buf, 10);
+    uart_puts(buf);
+
+    uart_puts_P(PSTR(" ("));
+    itoa(joystick.y_val_perc, buf, 10);
+    uart_puts(buf);
+    uart_puts_P(PSTR("%) | Dir: "));
+
+    switch (joystick.dir) {
+        case UP:       uart_puts_P(PSTR("UP")); break;
+        case DOWN:     uart_puts_P(PSTR("DOWN")); break;
+        case LEFT:     uart_puts_P(PSTR("LEFT")); break;
+        case RIGHT:    uart_puts_P(PSTR("RIGHT")); break;
+        default:       uart_puts_P(PSTR("NEUTRAL")); break;
+    }
+
+    uart_puts_P(PSTR("\r\n"));
+}
+
+void print_zeros(void) {
+    char buf[8];
+
+    uart_puts_P(PSTR("X0: ("));
+    itoa(joystick.x_zero, buf, 10);
+    uart_puts(buf);
+
+    uart_puts_P(PSTR(") | Y0: ("));
+    itoa(joystick.y_zero, buf, 10);
+    uart_puts(buf);
+    uart_puts_P(PSTR(")\r\n"));
+}
 
 void calibrate(void) {
-    printf("Calibrating joystick\r\n");
+    //printf("Calibrating joystick\r\n");
     uint8_t x, y;
     adc_read_avg(CALIBRATION_VALUE, &x, &y);
 
