@@ -9,6 +9,8 @@
 #define JOY_B_DDR     DDRD
 #define JOY_B_PIN     PD3
 
+
+
 // Joystick direction enum
 typedef enum Direction{
     UP,

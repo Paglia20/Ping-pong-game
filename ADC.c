@@ -83,4 +83,3 @@ uint8_t * adc_read(){
 
 
 
-//note 

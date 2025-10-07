@@ -1,5 +1,6 @@
 #include "include/board.h"
 #include "include/SPI.h"
+#include "include/bit_macros.h"
 #include <util/delay.h>  
 
 static inline void cs_low(void){  SPI_select(SPI_SLAVE_IO); }
@@ -86,6 +87,8 @@ bool board_set_pwm(uint8_t led, uint8_t pwd){
 }
 
 bool read_info(void){
+    if (!DEBUG) return;
+
     uint8_t info[35];
 
     cs_low();
@@ -98,12 +101,12 @@ bool read_info(void){
     }
     cs_high();
 
-    //print (comment?)
-    //printf("FW: ");
+    
+    printf("FW: ");
     for (uint8_t i = 0; i < 19; ++i) putchar(info[i]);
-    // printf("\r\nSN: ");
+    printf("\r\nSN: ");
     for (uint8_t i = 0; i < 16; ++i) putchar(info[19 + i]);
-    // printf("\r\n");
+    printf("\r\n");
 
     return true;
 }

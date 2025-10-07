@@ -14,6 +14,7 @@
 #define CALIBRATION_VALUE 10   
 #define AVG_SAMPLES 2 // to average out noise
 
+
 //min and max x from testing
 //min and max y from testing
 #define X_MIN 68
@@ -45,6 +46,7 @@ static inline void adc_read_avg(uint8_t samples, uint8_t *out_x, uint8_t *out_y)
 
 //uses uart_puts_p
 void print_joystick(void) {
+    if (!DEBUG) return;
     char buf[8];
 
     uart_puts_P(PSTR("X: "));
@@ -76,7 +78,10 @@ void print_joystick(void) {
 }
 
 void print_zeros(void) {
+    if (!DEBUG) return;
+
     char buf[8];
+    uart_puts_P(PSTR(")\r\n"));
 
     uart_puts_P(PSTR("X0: ("));
     itoa(joystick.x_zero, buf, 10);
@@ -98,6 +103,7 @@ void calibrate(void) {
 
     joystick.x_zero = x;
     joystick.y_zero = y;
+    print_zeros();
 }
 
 

@@ -9,6 +9,8 @@
 #ifndef BIT_MACROS_H_
 #define BIT_MACROS_H_
 
+#define DEBUG 0
+
 #define set_bit( reg, bit ) (reg |= (1 << bit))
 #define clear_bit( reg, bit ) (reg &= ~(1 << bit))
 #define test_bit( reg, bit ) (reg & (1 << bit))

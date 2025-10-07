@@ -63,10 +63,11 @@ void test_uart(void)
     while (1)
     {
         char c = uart_getc(); // wait for user input (blocking so dots)
-        // printf("typed c: %c\n\r", c, c);
+        if (!DEBUG) return;
+        printf("typed c: %c\n\r", c, c);
 
-        // uart_putc(c);             // echo it back
-        // printf("You typed: %c\n\r", c);
+        uart_putc(c);             // echo it back
+        printf("You typed: %c\n\r", c);
     }
 }
 
@@ -78,9 +79,10 @@ void test_adc(void)
     while (1)
     {
         uint8_t *values = adc_read(); // CH0..CH3
+        if (!DEBUG) return;
 
-        // printf("X =%3u  Y =%3u  SLIDER =%3u",
-        //        values[0], values[1], values[2]);
+        printf("X =%3u  Y =%3u  SLIDER =%3u",
+               values[0], values[1], values[2]);
 
         _delay_ms(200);
     }

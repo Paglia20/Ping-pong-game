@@ -106,6 +106,7 @@ void cursor_game(void) {
 
     while (1) {
         update_joystick();
+        print_joystick();
         Direction d = joystick.dir;
 
         if (d != NEUTRAL) {
