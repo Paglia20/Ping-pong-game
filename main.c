@@ -183,6 +183,25 @@ void test_loop(void){
 
 }
 
+void test_loop_int(void){
+    printf("MCP2515 loopback with int start...\n");
+
+    CAN_init_loopback_125k_4M9();
+
+
+    MCUCR = (MCUCR & ~((1<<ISC11)|(1<<ISC10))) | (1<<ISC11);  // falling edge
+    GICR  |= (1<<INT1);
+    sei();
+    
+    // --- frame di test ---
+    CanFrame tx = {
+        .id  = 0x123,
+        .dlc = 3,
+        .data = { 0x11, 0x22, 0x33 }
+    };
+
+}
+
 int main(void)
 {
 
@@ -222,8 +241,9 @@ int main(void)
 
     //menu_init();
 
-    test_loop();
+    //test_loop();
 
+    test_loop_int();
   
     // test_cs();
     return 0;   
