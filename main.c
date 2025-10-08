@@ -157,7 +157,7 @@ void test_loop(void){
 
     MCUCR = (MCUCR & ~((1<<ISC11)|(1<<ISC10))) | (1<<ISC11);  // falling edge
     GICR  |= (1<<INT1);
-    sei();
+    // sei();
     
     // --- frame di test ---
     CanFrame tx = {
@@ -222,8 +222,27 @@ int main(void)
 
     //menu_init();
 
-    //test_loop();
+    test_loop();
 
-
+  
+    // test_cs();
     return 0;   
+}
+
+void test_cs(void){
+    SPI_init();
+    while (1){
+    SPI_select(SPI_SLAVE_CONTR);
+    _delay_ms(1000);
+    SPI_deselect(SPI_SLAVE_CONTR);
+    _delay_ms(1000);
+    SPI_select(SPI_SLAVE_IO);
+    _delay_ms(1000);
+    SPI_deselect(SPI_SLAVE_IO);
+    _delay_ms(1000);
+    SPI_select(SPI_SLAVE_OLED);
+    _delay_ms(1000);
+    SPI_deselect(SPI_SLAVE_OLED);
+    _delay_ms(1000);
+    }
 }

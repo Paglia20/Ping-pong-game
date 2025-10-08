@@ -19,30 +19,25 @@ void MCP_init(void) {
     SPI_init();
 
     uint8_t value;
-
-    MCP_reset(); // Send reset - command
-
 }
 
 
 void MCP_reset(void) {
     cs_low();
-    _delay_ms(100);   
-
     SPI_txrx(MCP_RESET);                  // 0xC0 - RESET (datasheet §12.1)
     cs_high();
-    _delay_ms(100);   
+    _delay_ms(10);                        
 
     uint8_t value;
+
 
     // Self - test
     value = MCP_read ( MCP_CANSTAT);
     if (( value & MODE_MASK ) != MODE_CONFIG ) {
-    printf ( " MCP2515 is NOT in configuration mode after reset !\n " ) ;
-    }
-    while (1)
-    {;    }
-    
+    printf ( " MCP2515 is NOT in configuration mode after reset !\n %d ", value ) ;
+    } else {
+        printf("mode %d\n", value);
+    }    
                    
 }
 
