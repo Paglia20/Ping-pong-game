@@ -152,14 +152,13 @@ void test_OLED(void){
 void test_loop(void){
     printf("MCP2515 loopback  start...\n");
 
-    // --- inizializza CAN in loopback mode ---
     CAN_init_loopback_125k_4M9();
 
     // --- abilita interrupt su INT2 (PD2) ---
     GIFR |= (1 << INT2);    //Clear INT2 interrupt flag
     MCUCSR &= ~(1 << ISC2);   // fronte di discesa
     GICR   |=  (1 << INT2);   // abilita INT2
-    sei();                    // abilita interrupt globali
+    //sei();                    // abilita interrupt globali
     // |---> sei() fa tornare in cima al loop
 
     // for some readon loop here???
@@ -217,9 +216,9 @@ int main(void)
     //test_joystick();
     // test_slider();
 
-    //SPI_init();
+    SPI_init();
 
-    //OLED_init();
+    OLED_init();
 
     //test_OLED();
 

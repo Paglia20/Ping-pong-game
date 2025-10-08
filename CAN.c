@@ -2,7 +2,6 @@
 #include "include/SPI.h"
 #include "include/CAN.h"
 
-// helper: codifica/decodifica Standard ID (11 bit)
 static inline void id_to_regs(uint16_t id, uint8_t* sidh, uint8_t* sidl) {
     *sidh = (uint8_t)(id >> 3);
     *sidl = (uint8_t)((id & 0x07) << 5);   // standard frame, no extended
@@ -11,7 +10,7 @@ static inline uint16_t regs_to_id(uint8_t sidh, uint8_t sidl) {
     return (uint16_t)((sidh << 3) | (sidl >> 5));
 }
 
-// ---- Init: loopback ~125 kbps con Fosc=4.9 MHz ----
+//loopback ~125 kbps con Fosc=4.9 MHz
 void CAN_init_loopback_125k_4M9(void)
 {
     MCP_init();                 // prepara CS/INT GPIO
