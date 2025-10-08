@@ -222,7 +222,8 @@ int main(void)
 
     //menu_init();
 
-    test_loop();
+    //test_loop();
+
 
     return 0;   
 }

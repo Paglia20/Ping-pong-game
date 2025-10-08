@@ -13,6 +13,10 @@
 #define CS_IO_DDR     DDRB
 #define CS_IO_PIN     PB1
 
+#define CONTR_CS_PORT    PORTB
+#define CONTR_CS_DDR     DDRB 
+#define CONTR_CS_PIN    PB2
+
 #define DC_PORT PORTD
 #define DC_DDR  DDRD
 #define DC_PIN  PD2   
@@ -20,7 +24,8 @@
 
 typedef enum {
     SPI_SLAVE_OLED = 0,
-    SPI_SLAVE_IO   = 1
+    SPI_SLAVE_IO   = 1,
+    SPI_SLAVE_CONTR = 2
 } spi_slave_t;
 
 void    SPI_init(void);                       

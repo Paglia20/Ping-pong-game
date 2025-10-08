@@ -3,9 +3,9 @@
 #include "include/bit_macros.h"
 
 // PORTB &= ~(1 << CONTR_CS_PIN) // SELECT
-static inline void cs_low(void)  { CONTR_CS_PORT &= ~(1 << CONTR_CS_PIN); }
+static inline void cs_low(void)  {SPI_deselect(SPI_SLAVE_CONTR); SPI_select(SPI_SLAVE_CONTR); }
 // PORTB |=  (1 << CONTR_CS_PIN) // DESELECT
-static inline void cs_high(void) { CONTR_CS_PORT |=  (1 << CONTR_CS_PIN); }
+static inline void cs_high(void) { SPI_deselect(SPI_SLAVE_CONTR); }
 
 
 void MCP_init(void) {
@@ -18,16 +18,32 @@ void MCP_init(void) {
     // 2) SPI
     SPI_init();
 
-    // 3) DO NOT: MCP_reset() here (let caller decide)
-    // 4) DO NOT: MCUCR/GICR/sei() here (do in main or CAN init)
+    uint8_t value;
+
+    MCP_reset(); // Send reset - command
+
 }
 
 
 void MCP_reset(void) {
     cs_low();
+    _delay_ms(100);   
+
     SPI_txrx(MCP_RESET);                  // 0xC0 - RESET (datasheet §12.1)
     cs_high();
-    //_delay_ms(1);                       
+    _delay_ms(100);   
+
+    uint8_t value;
+
+    // Self - test
+    value = MCP_read ( MCP_CANSTAT);
+    if (( value & MODE_MASK ) != MODE_CONFIG ) {
+    printf ( " MCP2515 is NOT in configuration mode after reset !\n " ) ;
+    }
+    while (1)
+    {;    }
+    
+                   
 }
 
 //read a register from MCP2515

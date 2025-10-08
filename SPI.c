@@ -29,20 +29,29 @@ void SPI_select(spi_slave_t slave) {
     if (slave == SPI_SLAVE_OLED) {
         // /CS OLED LOW = selezionato
         CS_OLED_PORT &= ~(1 << CS_OLED_PIN);
-    } else {
+    } else if (slave == SPI_SLAVE_CONTR)
+    {
+        CONTR_CS_PORT &= ~(1 << CONTR_CS_PIN);
+    }
+    else {
         // /CS IO LOW = selezionato
         CS_IO_PORT   &= ~(1 << CS_IO_PIN);
     }
 }
 
 void SPI_deselect(spi_slave_t slave) {
-    if (slave == SPI_SLAVE_OLED) {
-        // /CS OLED HIGH = deselezionato
-        CS_OLED_PORT |=  (1 << CS_OLED_PIN);
-    } else {
-        // /CS IO HIGH = deselezionato
-        CS_IO_PORT   |=  (1 << CS_IO_PIN);
-    }
+    // if (slave == SPI_SLAVE_OLED) {
+    //     // /CS OLED HIGH = deselezionato
+    //     CS_OLED_PORT |=  (1 << CS_OLED_PIN);
+    // } else {
+    //     // /CS IO HIGH = deselezionato
+    //     CS_IO_PORT   |=  (1 << CS_IO_PIN);
+    // }
+            CS_IO_PORT   |=  (1 << CS_IO_PIN);
+
+            CS_OLED_PORT |=  (1 << CS_OLED_PIN);
+
+            CONTR_CS_PORT |=  (1 << CONTR_CS_PIN);
 }
 
 uint8_t SPI_txrx(uint8_t data) {

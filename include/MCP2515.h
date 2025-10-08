@@ -9,10 +9,6 @@
 #include <avr/pgmspace.h>
 
 
-#define CONTR_CS_PORT    PORTB
-#define CONTR_CS_DDR     DDRB 
-#define CONTR_CS_PIN    PB2
-
 #define CONTR_INT_PORT    PORTD
 #define CONTR_INT_DDR     DDRD
 #define CONTR_INT_PIN   PD3

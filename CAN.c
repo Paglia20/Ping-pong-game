@@ -14,7 +14,6 @@ void CAN_init_loopback_125k_4M9(void)
 {
     MCP_init();                 // set CS/INT pins, init SPI  (no reset here)
     MCP_reset();                // now CS is an output → reset works
-    MCP_set_mode(MODE_CONFIG);
 
     // Bit-timing per ~122.5 kbps (20 TQ, SJW=1TQ)
     // TQ = 2*(BRP+1)/Fosc -> BRP=0 -> TQ≈408ns; 20*TQ≈8.16us => 122.5 kbps
