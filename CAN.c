@@ -1,6 +1,7 @@
 #include "include/MCP2515.h"
 #include "include/SPI.h"
 #include "include/CAN.h"
+#include <avr/interrupt.h>   
 
 static inline void id_to_regs(uint16_t id, uint8_t* sidh, uint8_t* sidl) {
     *sidh = (uint8_t)(id >> 3);
@@ -24,6 +25,7 @@ void CAN_init_loopback_125k_4M9(void)
     MCP_write(MCP_RXB0CTRL, 0x60);
     MCP_write(MCP_RXB1CTRL, 0x60);
 
+    MCP_clear_interrupt_flags(0xFF);               
     MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);  // single write
     MCP_clear_interrupt_flags(0xFF);
 

@@ -153,11 +153,6 @@ void test_loop(void){
     printf("MCP2515 loopback  start...\n");
 
     CAN_init_loopback_125k_4M9();
-
-
-    MCUCR = (MCUCR & ~((1<<ISC11)|(1<<ISC10))) | (1<<ISC11);  // falling edge
-    GICR  |= (1<<INT1);
-    // sei();
     
     // --- frame di test ---
     CanFrame tx = {
@@ -199,6 +194,7 @@ void test_loop_int(void){
         .dlc = 3,
         .data = { 0x11, 0x22, 0x33 }
     };
+    CAN_send(&tx);
 
 }
 
