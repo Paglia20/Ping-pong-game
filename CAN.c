@@ -10,12 +10,11 @@ static inline uint16_t regs_to_id(uint8_t sidh, uint8_t sidl) {
     return (uint16_t)((sidh << 3) | (sidl >> 5));
 }
 
-//loopback ~125 kbps con Fosc=4.9 MHz
 void CAN_init_loopback_125k_4M9(void)
 {
-    MCP_init();                 // prepara CS/INT GPIO
-    MCP_reset();
-    MCP_set_mode(MODE_CONFIG);  // i CNF si scrivono solo in config
+    MCP_init();                 // set CS/INT pins, init SPI  (no reset here)
+    MCP_reset();                // now CS is an output → reset works
+    MCP_set_mode(MODE_CONFIG);
 
     // Bit-timing per ~122.5 kbps (20 TQ, SJW=1TQ)
     // TQ = 2*(BRP+1)/Fosc -> BRP=0 -> TQ≈408ns; 20*TQ≈8.16us => 122.5 kbps
@@ -23,20 +22,13 @@ void CAN_init_loopback_125k_4M9(void)
     MCP_write(MCP_CNF2, 0xAF);  // BTLMODE=1, SAM=0, PHSEG1=5 (PS1=6), PRSEG=7 (Prop=8)
     MCP_write(MCP_CNF3, 0x04);  // PHSEG2=4 (PS2=5)
 
-    // Accetta tutto su entrambe le RX
-    MCP_write(MCP_RXB0CTRL, 0x60); 
+    MCP_write(MCP_RXB0CTRL, 0x60);
     MCP_write(MCP_RXB1CTRL, 0x60);
 
-    // Abilita interrupt su RX0 e TX0
-    MCP_enable_interrupts(MCP_RX_INT);
-    MCP_enable_interrupts(MCP_TX_INT);
-
-    // Pulisci eventuali flag pendenti
+    MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);  // single write
     MCP_clear_interrupt_flags(0xFF);
 
-    // Loopback mode: il frame TX rientra in RX
     MCP_set_mode(MODE_LOOPBACK);
-
 }
 
 // ---- TX: carica TXB0 e invia ----

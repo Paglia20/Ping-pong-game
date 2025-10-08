@@ -2,34 +2,24 @@
 #include "include/SPI.h"    // usa la tua SPI_txrx() e SPI_select/deselect()
 #include "include/bit_macros.h"
 
-// ---- GPIO (CS=PB2, INT=PB3) ----
+// PORTB &= ~(1 << CONTR_CS_PIN) // SELECT
 static inline void cs_low(void)  { CONTR_CS_PORT &= ~(1 << CONTR_CS_PIN); }
+// PORTB |=  (1 << CONTR_CS_PIN) // DESELECT
 static inline void cs_high(void) { CONTR_CS_PORT |=  (1 << CONTR_CS_PIN); }
 
 
 void MCP_init(void) {
-    SPI_init();
-    MCP_reset();
-
-    uint8_t value;
-
-    // // Self - test
-    // value = MCP_read( MCP_CANSTAT) ;
-    // if (( value & MODE_MASK ) != MODE_CONFIG ) {
-    //     if (DEBUG){
-    //         printf("MCP2515 is NOT in configuration mode after reset !\n");
-    //     }
-    // return;
-    // }
-    
+    // 1) GPIO
     CONTR_CS_DDR  |=  (1 << CONTR_CS_PIN);   // CS output
-    CONTR_INT_DDR  &= ~(1 << CONTR_INT_PIN);  // INT input
-    cs_high();   
-                        
-    CONTR_INT_PORT |=  (1 << CONTR_INT_PIN);  // pull-up su INT
+    cs_high();                               
+    CONTR_INT_DDR &= ~(1 << CONTR_INT_PIN);  // INT input
+    CONTR_INT_PORT |= (1 << CONTR_INT_PIN);  // pull-up on INT
 
+    // 2) SPI
+    SPI_init();
 
-
+    // 3) DO NOT: MCP_reset() here (let caller decide)
+    // 4) DO NOT: MCUCR/GICR/sei() here (do in main or CAN init)
 }
 
 
@@ -76,8 +66,8 @@ void MCP_rts(uint8_t buffer_index) {
 
 uint8_t MCP_read_status(void) {
     cs_low();
-    SPI_txrx(MCP_READ_STATUS);            // 0xA0 (§12.6)
-    uint8_t status = SPI_receive();
+    SPI_txrx(MCP_READ_STATUS);
+    uint8_t status = SPI_txrx(0x00);
     cs_high();
     return status;
 }

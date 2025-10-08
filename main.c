@@ -154,15 +154,10 @@ void test_loop(void){
 
     CAN_init_loopback_125k_4M9();
 
-    // --- abilita interrupt su INT2 (PD2) ---
-    GIFR |= (1 << INT2);    //Clear INT2 interrupt flag
-    MCUCSR &= ~(1 << ISC2);   // fronte di discesa
-    GICR   |=  (1 << INT2);   // abilita INT2
-    //sei();                    // abilita interrupt globali
-    // |---> sei() fa tornare in cima al loop
 
-    // for some readon loop here???
-
+    MCUCR = (MCUCR & ~((1<<ISC11)|(1<<ISC10))) | (1<<ISC11);  // falling edge
+    GICR  |= (1<<INT1);
+    sei();
     
     // --- frame di test ---
     CanFrame tx = {
