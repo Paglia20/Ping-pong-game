@@ -80,7 +80,7 @@ bool CAN_receive(CanFrame* out)
 }
 
 ISR(INT1_vect)
-{
+{   
     uint8_t flags = MCP_get_interrupt_flags();
 
     if (flags & MCP_RX0IF) { //perchè?  MCP_RX0IF
@@ -88,11 +88,13 @@ ISR(INT1_vect)
 
         CAN_receive(&rx);
 
-        printf("Received frame!\n");
-        printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
-        for (uint8_t i = 0; i < rx.dlc; i++)
-            printf(" %02X", rx.data[i]);
-        printf("\n");
+        if (1) {
+            printf("Received frame!\n");
+            printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
+            for (uint8_t i = 0; i < rx.dlc; i++)
+                printf(" %02X", rx.data[i]);
+            printf("\n");
+        }
     }
 
     if (flags & MCP_TX0IF) {
@@ -100,5 +102,5 @@ ISR(INT1_vect)
         // printf transmission complete 
     }
 
-    // other flags 
+    // other flags?
 }

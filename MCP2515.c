@@ -34,8 +34,9 @@ void MCP_reset(void) {
     // Self - test
     value = MCP_read ( MCP_CANSTAT);
     if (( value & MODE_MASK ) != MODE_CONFIG ) {
-    printf ( " MCP2515 is NOT in configuration mode after reset !\n %d ", value ) ;
-    } else {
+    printf ("MCP NOT in configuration after reset !\n %d ", value ) ;
+    } else if (DEBUG)
+    {
         printf("mode %d\n", value);
     }    
                    

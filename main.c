@@ -154,27 +154,27 @@ void test_loop(void){
 
     CAN_init_loopback_125k_4M9();
     
-    // --- frame di test ---
     CanFrame tx = {
         .id  = 0x123,
         .dlc = 3,
         .data = { 0x11, 0x22, 0x33 }
     };
 
-    printf("Sending CAN frame...\n");
+    //printf("Sending CAN frame...\n");
     CAN_send(&tx);
 
-    // --- in loopback il frame ritorna in RX subito ---
     CanFrame rx;
     while (!CAN_receive(&rx)) {
         // busy-wait
     }
 
-    printf("Received frame!\n");
-    printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
-    for (uint8_t i = 0; i < rx.dlc; i++)
-        printf(" %02X", rx.data[i]);
-    printf("\n");
+    if (1) {
+        printf("Received frame!\n");
+        printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
+        for (uint8_t i = 0; i < rx.dlc; i++)
+            printf(" %02X", rx.data[i]);
+        printf("\n");
+    }
 
 }
 
@@ -187,8 +187,7 @@ void test_loop_int(void){
     MCUCR = (MCUCR & ~((1<<ISC11)|(1<<ISC10))) | (1<<ISC11);  // falling edge
     GICR  |= (1<<INT1);
     sei();
-    
-    // --- frame di test ---
+
     CanFrame tx = {
         .id  = 0x123,
         .dlc = 3,
@@ -196,13 +195,15 @@ void test_loop_int(void){
     };
     CAN_send(&tx);
 
+    while (1) {
+        //wait for interrupt
+    }
 }
 
 int main(void)
 {
 
     fflush(stdout);
-
     // INITS
     UART_init(F_CPU, BAUD); // 9600 8N1
     XMEM_init();
@@ -235,11 +236,11 @@ int main(void)
 
     //cursor_game();
 
-    //menu_init();
+    menu_init();
 
     //test_loop();
 
-    test_loop_int();
+    //test_loop_int();
   
     // test_cs();
     return 0;   
