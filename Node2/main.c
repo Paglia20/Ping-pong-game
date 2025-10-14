@@ -20,8 +20,8 @@ int main()
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
     //Uncomment after including uart above
-    //uart_init(/*cpufreq*/, /*baud*/);
-    //printf("Hello World\n\r");
+    uart_init(F_CPU, 115200);
+    printf("Hello World\n\r");
 
     while (1)
     {
