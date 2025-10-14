@@ -237,11 +237,11 @@ int main(void)
 
     //cursor_game();
 
-    menu_init();
+    //menu_init();
 
     //test_loop();
 
-    //test_loop_int();
+    test_loop_int();
   
     // test_cs();
     return 0;   
