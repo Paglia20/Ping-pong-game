@@ -40,12 +40,9 @@ void test_dlatch(void)
 {
     //printf("Starting Latch test...\n\r");
 
-    // Imposta PA0–PA7 come outpuADCt (bus dati)
     DDRA = 0xFF;
-    // Imposta PE1 come output (ALE)
     DDRE |= (1 << PE1);
 
-    // Inizializza uscite a zero
     PORTA = 0x00;
     PORTE &= ~(1 << PE1);
 
@@ -240,11 +237,11 @@ int main(void)
 
     //cursor_game();
 
-    menu_init();
+    //menu_init();
 
     //test_loop();
 
-    //test_loop_int();
+    test_loop_int();
   
     // test_cs();
     return 0;   
