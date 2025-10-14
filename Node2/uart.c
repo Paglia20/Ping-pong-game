@@ -1,4 +1,4 @@
-#include "sam.h"
+#include "sam/sam3x/include/sam.h"
 #include <stdio.h>
 
 #define F_CPU 84000000

@@ -11,9 +11,9 @@
 #include "can_interrupt.h"
 
 #include <stdio.h>
-#include "sam.h"
+#include "sam/sam3x/include/sam.h"
 
-#include "../uart_and_printf/printf-stdarg.h"
+//#include "../uart_and_printf/printf-stdarg.h"
 
 #include "can_controller.h"
 

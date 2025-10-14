@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include "sam.h"
+#include "sam/sam3x/include/sam.h"
 
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
@@ -11,7 +11,7 @@
  * If you get errors such as "arm-none-eabi-gcc: no such file", you may need to reinstall the arm gcc packages using
  * apt or your favorite package manager.
  */
-//#include "../path_to/uart.h"
+#include "uart.h"
 
 int main()
 {
