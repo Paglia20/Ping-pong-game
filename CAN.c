@@ -81,7 +81,7 @@ ISR(INT1_vect)
 {   
     uint8_t flags = MCP_get_interrupt_flags();
 
-    if (flags & MCP_RX0IF) { //perchè?  MCP_RX0IF
+    if (flags & MCP_RX0IF) { 
         CanFrame rx;
 
         CAN_receive(&rx);
@@ -101,6 +101,4 @@ ISR(INT1_vect)
         MCP_clear_interrupt_flags(MCP_TX0IF);
         // printf transmission complete 
     }
-
-    // other flags?
 }

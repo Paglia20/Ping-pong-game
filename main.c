@@ -150,7 +150,9 @@ void test_OLED(void){
 }
 
 void test_loop(void){
-    printf("MCP2515 loopback  start...\n");
+    if (DEBUG_CAN) {
+        printf("MCP2515 loopback  start...\n");
+    }
 
     CAN_init_loopback_125k_4M9();
     
@@ -179,7 +181,9 @@ void test_loop(void){
 }
 
 void test_loop_int(void){
-    printf("MCP2515 loopback with int start...\n");
+    if (DEBUG_CAN) {
+        printf("MCP2515 loopback with int...\n");
+    }
 
     CAN_init_loopback_125k_4M9();
 

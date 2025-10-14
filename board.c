@@ -101,12 +101,13 @@ bool read_info(void){
     }
     cs_high();
 
-    
-    printf("FW: ");
-    for (uint8_t i = 0; i < 19; ++i) putchar(info[i]);
-    printf("\r\nSN: ");
-    for (uint8_t i = 0; i < 16; ++i) putchar(info[19 + i]);
-    printf("\r\n");
+    if (DEBUG) {
+        printf("FW: ");
+        for (uint8_t i = 0; i < 19; ++i) putchar(info[i]);
+        printf("\r\nSN: ");
+        for (uint8_t i = 0; i < 16; ++i) putchar(info[19 + i]);
+        printf("\r\n");
+    }
 
     return true;
 }

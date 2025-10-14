@@ -56,7 +56,6 @@ void menu_init(void){
     }
 }
 
-// === MENU DRAW ===
 void draw_menu(Menu* menu) {
     oled_clear();
 
@@ -71,7 +70,6 @@ void draw_menu(Menu* menu) {
     oled_putchar('>');
 }
 
-// === SUBMENU DRAW ===
 void draw_submenu(MenuItem* subMenu) {
     parentMenu = currentMenu;     
     subMenuObj.items = subMenu;   
@@ -93,7 +91,6 @@ void execute_action(MenuItem* item) {
     draw_menu(currentMenu);
 }
 
-// === NAVIGATION ===
 void menu_navigation_up(void) {
     if (selectedIndex > 0) {
         selectedIndex--;
@@ -108,7 +105,6 @@ void menu_navigation_down(void) {
     }
 }
 
-// === SELECT ===
 void menu_select(void) {
     MenuItem* selected_item = &currentMenu->items[selectedIndex];
 
@@ -122,12 +118,10 @@ void menu_select(void) {
         return;
     }
 
-    // Fallback: generic action display
     execute_action(selected_item);
 }
 
 
-// === MAIN LOOP ===
 void menu_loop(void) {
     update_joystick(); 
     Direction d = joystick.dir;
@@ -197,14 +191,13 @@ void test_avr(void){
                 if (board.Down)  oled_print("NAV down");
                 if (board.Left)  oled_print("NAV left");
                 if (board.Right) oled_print("NAV right");
-                if (board.L1)    {oled_print("L1"); board_set_led(0, true);}                //test turn on led from menu
+                if (board.L1)    {oled_print("L1"); board_set_led(0, true);}                
                 if (board.L2)    {oled_print("L2"); board_set_led(0, false);}
 
                 if (board.R1)    {test = 0;}
             }
         }
 
-        //not sure if the behaviour will be correct
         _delay_ms(10);
     }
 

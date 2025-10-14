@@ -107,5 +107,5 @@ uint8_t MCP_get_interrupt_flags(void) {
 }
 
 void MCP_clear_interrupt_flags(uint8_t mask) {
-    MCP_bit_modify(MCP_CANINTF, mask, 0x00);  // datasheet: usare BIT MODIFY per pulire
+    MCP_bit_modify(MCP_CANINTF, mask, 0x00); 
 }

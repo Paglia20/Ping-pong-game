@@ -46,18 +46,12 @@ static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8
     }
 }
 
-
-
-// Update joystick position and direction
 void update_slider(void){
     uint8_t *data = adc_read();
 
     uint8_t x;
     x = data[2];
 	slider.x_val = x;
-    slider.x_val_perc  = percent_axis(x, slider.x_zero, 0, 255);
-
-	//printf_P(PSTR("updated position slider\r\n"));
-	
+    slider.x_val_perc  = percent_axis(x, slider.x_zero, 0, 255);	
 }
 
