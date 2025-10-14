@@ -2,8 +2,8 @@
 #include <avr/io.h>
 #include <stdio.h>
 
-#include "include/bit_macros.h"
-#include "include/SRAM.h"
+#include "../include/bit_macros.h"
+#include "../include/SRAM.h"
 
 
 #define FIRST_ADDRESS 0x1800

@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 
-#include "include/ADC.h"
-#include "include/UART.h"
-#include "include/bit_macros.h"
-#include "include/joystick.h"
-#include "include/slider.h"
+#include "../include/ADC.h"
+#include "../include/UART.h"
+#include "../include/bit_macros.h"
+#include "../include/joystick.h"
+#include "../include/slider.h"
 
 Slider slider;
 

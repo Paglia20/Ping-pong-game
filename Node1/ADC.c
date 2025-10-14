@@ -1,8 +1,8 @@
-#include "include/UART.h"
-#include "include/SRAM.h"
-#include "include/decoder.h"
-#include "include/bit_macros.h"
-#include "include/ADC.h"
+#include "../include/UART.h"
+#include "../include/SRAM.h"
+#include "../include/decoder.h"
+#include "../include/bit_macros.h"
+#include "../include/ADC.h"
 
 #define adc_address 0x1000
 #define num_channels 3

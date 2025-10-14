@@ -1,6 +1,6 @@
-#include "include/board.h"
-#include "include/SPI.h"
-#include "include/bit_macros.h"
+#include "../include/board.h"
+#include "../include/SPI.h"
+#include "../include/bit_macros.h"
 #include <util/delay.h>  
 
 static inline void cs_low(void){  SPI_select(SPI_SLAVE_IO); }

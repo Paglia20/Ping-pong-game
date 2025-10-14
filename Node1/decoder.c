@@ -3,8 +3,8 @@
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "include/UART.h"
-#include "include/SRAM.h"
+#include "../include/UART.h"
+#include "../include/SRAM.h"
 
 
 

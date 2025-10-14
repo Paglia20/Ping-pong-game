@@ -1,6 +1,6 @@
-#include "include/MCP2515.h"
-#include "include/SPI.h"
-#include "include/CAN.h"
+#include "../include/MCP2515.h"
+#include "../include/SPI.h"
+#include "../include/CAN.h"
 #include <avr/interrupt.h>   
 
 static inline void id_to_regs(uint16_t id, uint8_t* sidh, uint8_t* sidl) {

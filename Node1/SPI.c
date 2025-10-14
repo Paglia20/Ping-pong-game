@@ -1,4 +1,4 @@
-#include "include/SPI.h"
+#include "../include/SPI.h"
 
 void SPI_init(void) {
     // MOSI (PB5), SCK (PB7), SS_hw (PB4) -> output

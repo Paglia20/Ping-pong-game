@@ -5,8 +5,8 @@
 
 
 
-#include "include/UART.h"
-#include "include/bit_macros.h"
+#include "../include/UART.h"
+#include "../include/bit_macros.h"
 
 // Hook stdio to UART
 static int uart_putchar(char c, FILE *stream) {

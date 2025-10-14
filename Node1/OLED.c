@@ -1,7 +1,7 @@
 
-#include "include/OLED.h"
-#include "include/SPI.h"
-#include "include/fonts.h"
+#include "../include/OLED.h"
+#include "../include/SPI.h"
+#include "../include/fonts.h"
 
 #define FONT_WIDTH 4
 #define FONT_SPACING 1   // one blank column between chars

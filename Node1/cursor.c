@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <util/delay.h>
 
-#include "include/OLED.h"
-#include "include/SPI.h"
-#include "include/cursor.h"
-#include "include/joystick.h"
+#include "../include/OLED.h"
+#include "../include/SPI.h"
+#include "../include/cursor.h"
+#include "../include/joystick.h"
 
 static inline void write_byte(uint8_t page, uint8_t col, uint8_t value) {
     oled_set_cursor(page, col);

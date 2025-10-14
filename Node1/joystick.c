@@ -5,10 +5,10 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 
-#include "include/ADC.h"
-#include "include/UART.h"
-#include "include/bit_macros.h"
-#include "include/joystick.h"
+#include "../include/ADC.h"
+#include "../include/UART.h"
+#include "../include/bit_macros.h"
+#include "../include/joystick.h"
 
 #define DEADZONE 20   
 #define CALIBRATION_VALUE 10   

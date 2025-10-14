@@ -1,9 +1,9 @@
-#include "include/OLED.h"
-#include "include/SPI.h"
-#include "include/menu.h"
-#include "include/joystick.h"  
-#include "include/cursor.h"
-#include "include/board.h"
+#include "../include/OLED.h"
+#include "../include/SPI.h"
+#include "../include/menu.h"
+#include "../include/joystick.h"  
+#include "../include/cursor.h"
+#include "../include/board.h"
 #include <util/delay.h>
 #include <stdio.h> 
 

@@ -1,6 +1,6 @@
-#include "include/MCP2515.h"
-#include "include/SPI.h"    // usa la tua SPI_txrx() e SPI_select/deselect()
-#include "include/bit_macros.h"
+#include "../include/MCP2515.h"
+#include "../include/SPI.h"    // usa la tua SPI_txrx() e SPI_select/deselect()
+#include "../include/bit_macros.h"
 
 // PORTB &= ~(1 << CONTR_CS_PIN) // SELECT
 static inline void cs_low(void)  {SPI_deselect(SPI_SLAVE_CONTR); SPI_select(SPI_SLAVE_CONTR); }
