@@ -40,18 +40,11 @@ void SPI_select(spi_slave_t slave) {
 }
 
 void SPI_deselect(spi_slave_t slave) {
-    // if (slave == SPI_SLAVE_OLED) {
-    //     // /CS OLED HIGH = deselezionato
-    //     CS_OLED_PORT |=  (1 << CS_OLED_PIN);
-    // } else {
-    //     // /CS IO HIGH = deselezionato
-    //     CS_IO_PORT   |=  (1 << CS_IO_PIN);
-    // }
-            CS_IO_PORT   |=  (1 << CS_IO_PIN);
+    CS_IO_PORT   |=  (1 << CS_IO_PIN);
 
-            CS_OLED_PORT |=  (1 << CS_OLED_PIN);
+    CS_OLED_PORT |=  (1 << CS_OLED_PIN);
 
-            CONTR_CS_PORT |=  (1 << CONTR_CS_PIN);
+    CONTR_CS_PORT |=  (1 << CONTR_CS_PIN);
 }
 
 uint8_t SPI_txrx(uint8_t data) {
@@ -81,29 +74,3 @@ void SPI_read_n(uint8_t* buffer, uint16_t n) {
     }
 }
 
-
-
-// ATmega162 --SPI--> OLED (solo out)
-// ATmega162 --SPI--> AVR IO board (miso per pulasanti and mosi per comandi)
-
-
-
-// IOBoard.c (AVR128DA)
-// IO_select() / IO_deselect().
-// Funzioni tipo IO_get_buttons() fanno la sequenza SS↓ → transmit/receive → SS↑.
-//DDRB  &= ~(1<<DDB6); // forza DDB6 a 0.
-
-
-
-// REGISTERS ATmega162
-// SPCR (Control)
-// SPE → abilita SPI
-// MSTR → 1 = master, 0 = slave
-// CPOL/CPHA → configurano i 4 “mode” (0–3)
-// SPR1:SPR0 → divisore clock
-// SPIE → abilita interrupt
-// SPSR (Status)
-// SPIF → trasferimento completato
-// WCOL → write collision (hai scritto durante una trasmissione)
-// SPI2X → velocità doppia (solo master)
-// SPDR (Data)
