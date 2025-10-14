@@ -168,7 +168,7 @@ void test_loop(void){
         // busy-wait
     }
 
-    if (1) {
+    if (DEBUG_CAN) {
         printf("Received frame!\n");
         printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
         for (uint8_t i = 0; i < rx.dlc; i++)
@@ -195,7 +195,7 @@ void test_loop_int(void){
     };
     CAN_send(&tx);
 
-    while (1) {
+    while (DEBUG_CAN) {
         //wait for interrupt
     }
 }

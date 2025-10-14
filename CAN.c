@@ -32,7 +32,6 @@ void CAN_init_loopback_125k_4M9(void)
     MCP_set_mode(MODE_LOOPBACK);
 }
 
-// ---- TX: carica TXB0 e invia ----
 bool CAN_send(const CanFrame* f)
 {
     if (!f || f->dlc > 8) return false;
@@ -47,18 +46,18 @@ bool CAN_send(const CanFrame* f)
     for (uint8_t i = 0; i < f->dlc; i++) {
         MCP_write((uint8_t)(TXB0D0 + i), f->data[i]);
     }
-
-    // Richiedi la trasmissione del buffer 0
+    
+    //require transm
     MCP_rts(0);  
     return true;
 }
 
-// ---- RX: preleva un frame da RXB0 se presente ----
+
 bool CAN_receive(CanFrame* out)
 {
     if (!out) return false;
 
-    // doppio controllo su flag RX0IF 
+    // double check shouldnt be necessary
     uint8_t flags = MCP_get_interrupt_flags();
     if (!(flags & MCP_RX0IF))
         return false;
@@ -74,7 +73,6 @@ bool CAN_receive(CanFrame* out)
         out->data[i] = MCP_read((uint8_t)(RXB0D0 + i));
     }
 
-    // Pulisci il flag RX0IF (INT torna alto se non ci sono altri flag)
     MCP_clear_interrupt_flags(MCP_RX0IF);
     return true;
 }
@@ -88,7 +86,9 @@ ISR(INT1_vect)
 
         CAN_receive(&rx);
 
-        if (1) {
+        //handle received frame
+
+        if (DEBUG_CAN) {
             printf("Received frame!\n");
             printf("ID: 0x%03X, DLC: %u, DATA:", rx.id, rx.dlc);
             for (uint8_t i = 0; i < rx.dlc; i++)
