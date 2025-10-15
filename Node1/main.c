@@ -239,9 +239,9 @@ int main(void)
 
     //menu_init();
 
-    //test_loop();
+    test_loop();
 
-    test_loop_int();
+    //test_loop_int();
   
     // test_cs();
     return 0;   

@@ -19,14 +19,15 @@ int main()
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
+    //set high servo pin
     PMC ->PMC_PCER0 |= (1 << ID_PIOB); 
     PIOB ->PIO_PER |= PIO_PB12;
     PIOB ->PIO_OER |= PIO_PB12; 
     PIOB ->PIO_SODR |= PIO_PB12; 
 
     //Uncomment after including uart above
-    // uart_init(F_CPU, 115200);
-    // printf("Hello World\n\r");
+    uart_init(F_CPU, 115200);
+    printf("Hello World\n\r");
 
     while (1)
     {
