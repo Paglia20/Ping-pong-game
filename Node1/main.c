@@ -261,7 +261,7 @@ void test_nodes_communication(void){
         printf("MCP2515 normal mode start...\n");
     }
 
-    CAN_init_normal_500k_4M9();
+    CAN_init_normal_500k_16();
 
     uint8_t counter = 0;
 

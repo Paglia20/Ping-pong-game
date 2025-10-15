@@ -26,33 +26,13 @@ int main()
     PIOB ->PIO_OER |= PIO_PB12; 
     PIOB ->PIO_SODR |= PIO_PB12; 
 
-    // //clock out
-    PMC->PMC_PCER0 |= (1 << ID_PIOB);
-
-    // Configure PCK0: source = Master Clock (MCK), no prescaler
-    PMC->PMC_PCK[0] = PMC_PCK_CSS_MCK | PMC_PCK_PRES(0);
-    PMC->PMC_SCER |= PMC_SCER_PCK0; // Enable PCK0
-
-    // Wait for the clock to be ready
-    while (!(PMC->PMC_SR & PMC_SR_PCKRDY0));
-
-    // --- Route PCK0 to PB27 (Arduino pin 13) ---
-    // Peripheral B function on PB27 → PCK0
-    const uint32_t PB27 = (1u << 27);  // Bit mask for PB27
-
-    // Select peripheral B for PB27 (set bit in ABSR)
-    PIOB->PIO_ABSR |= PB27;
-
-    // Disable PIO control so peripheral can drive the pin
-    PIOB->PIO_PDR  |= PB27;
-
 
     //Uncomment after including uart above
     uart_init(F_CPU, 115200);
     printf("Hello World\n\r");
 
-    // 125 kbps, must match Node 1
-    uint32_t can_br = 0x00053255;  // lab sheet value
+    // 500 kbps, must match Node 1
+    uint32_t can_br = 0x000D1242;  // lab sheet value
     CanInit cfg;
     cfg.reg = can_br;
     can_init(cfg, 0);

@@ -32,15 +32,14 @@ void CAN_init_loopback_125k_4M9(void)
     MCP_set_mode(MODE_LOOPBACK);
 }
 
-void CAN_init_normal_500k_4M9(void)
+void CAN_init_normal_500k_16(void)
 {
     MCP_init();                 
     MCP_reset();
 
-    // Bit-timing ~125 kbps @ 4.9152 MHz, 20 Tq, sample point ≈ (1+8+6)/20 = 75%
-    MCP_write(MCP_CNF1, 0x00);   // SJW=1TQ, BRP=0
-    MCP_write(MCP_CNF2, 0xAF);   // BTLMODE=1, SAM=0, PHSEG1=5, PRSEG=7
-    MCP_write(MCP_CNF3, 0x04);   // PHSEG2=4
+    MCP_write(MCP_CNF1, 0xC0);   
+    MCP_write(MCP_CNF2, 0xAA);   
+    MCP_write(MCP_CNF3, 0x05);  
 
     // Accetta tutto su RXB0/RXB1 (RXM=11)
     MCP_write(MCP_RXB0CTRL, 0x60);

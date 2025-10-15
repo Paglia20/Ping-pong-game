@@ -30,7 +30,7 @@ bool CAN_send(const CanFrame* f);
 // receive one frame from RXB0 (returns false if nothing)
 bool CAN_receive(CanFrame* out);
 
-void CAN_init_normal_500k_4M9(void);
+void CAN_init_normal_500k_16(void);
 
 
 
