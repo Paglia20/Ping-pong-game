@@ -50,12 +50,12 @@ static void can_init(CanInit init, uint8_t rxInterrupt){
 
     // Configure mailboxes
     // transmit
-    CAN0->CAN_MB[txMailbox].CAN_MID = CAN_MID_MIDE;
+    CAN0->CAN_MB[txMailbox].CAN_MID = 0;
     CAN0->CAN_MB[txMailbox].CAN_MMR = CAN_MMR_MOT_MB_TX;
     
     // receive
     CAN0->CAN_MB[rxMailbox].CAN_MAM = 0; // Accept all messages
-    CAN0->CAN_MB[rxMailbox].CAN_MID = CAN_MID_MIDE;
+    CAN0->CAN_MB[rxMailbox].CAN_MID = 0;
     CAN0->CAN_MB[rxMailbox].CAN_MMR = CAN_MMR_MOT_MB_RX;
     CAN0->CAN_MB[rxMailbox].CAN_MCR |= CAN_MCR_MTCR;
     if(rxInterrupt){
@@ -92,15 +92,20 @@ uint8_t can_rx(CanMsg* m){
         return 0;
     }
 
+    uint32_t dl = CAN0->CAN_MB[rxMailbox].CAN_MDL;
+    uint32_t dh = CAN0->CAN_MB[rxMailbox].CAN_MDH;
+
     // Get message ID
-    m->id = (uint8_t)((CAN0->CAN_MB[rxMailbox].CAN_MID & CAN_MID_MIDvA_Msk) >> CAN_MID_MIDvA_Pos);
+    m->id = (uint16_t)((CAN0->CAN_MB[rxMailbox].CAN_MID & CAN_MID_MIDvA_Msk) >> CAN_MID_MIDvA_Pos);
         
     // Get data length
     m->length = (uint8_t)((CAN0->CAN_MB[rxMailbox].CAN_MSR & CAN_MSR_MDLC_Msk) >> CAN_MSR_MDLC_Pos);
     
-    // Get data from CAN mailbox
-    m->dword[0] = CAN0->CAN_MB[rxMailbox].CAN_MDL;
-    m->dword[1] = CAN0->CAN_MB[rxMailbox].CAN_MDH;
+    for (uint8_t i = 0; i < m->length && i<8; i++)
+    {
+        m->byte[i] = (i < 4) ? (dl >> (8 * i)) : (dh >> (8 * (i - 4))) ;
+    }
+    
                 
     // Reset for new receive
     CAN0->CAN_MB[rxMailbox].CAN_MMR = CAN_MMR_MOT_MB_RX;

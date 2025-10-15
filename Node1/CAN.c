@@ -50,7 +50,7 @@ void CAN_init_normal_125k_4M9(void)
     MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);
     MCP_clear_interrupt_flags(0xFF);
 
-    MCP_set_mode(MODE_NORMAL);   // <-- QUI la differenza
+    MCP_set_mode(MODE_NORMAL);   
 }
 
 bool CAN_send(const CanFrame* f)

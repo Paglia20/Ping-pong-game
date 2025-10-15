@@ -12,11 +12,10 @@
  * apt or your favorite package manager.
  */
 #include "uart.h"
-#include "can_controller.h"
 #include "can.h"
 
 int main()
-{
+{   
     SystemInit();
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
@@ -33,21 +32,25 @@ int main()
 
     // 125 kbps, must match Node 1
     uint32_t can_br = 0x00290165;  // lab sheet value
-    can_init_def_tx_rx_mb(can_br);
+    CanInit cfg;
+    cfg.reg = can_br;
+    can_init(cfg, 0);
 
     printf("CAN initialized.\n\r");
 
-    CAN_MESSAGE rx_msg;
+    CanMsg rx_msg;
 
     while (1)
     {
-        if (can_receive(&rx_msg, 1) == 0)
-        {
-            printf("RX ID=0x%03X LEN=%d DATA:", rx_msg.id, rx_msg.data_length);
-            for (uint8_t i = 0; i < rx_msg.data_length; i++)
-                printf(" %02X", rx_msg.data[i]);
+        if (can_rx(&rx_msg) == 1) {
+            printf("RX ID=0x%03X LEN=%d DATA:", rx_msg.id, rx_msg.length);
+            for (uint8_t i = 0; i < rx_msg.length; i++){
+                printf(" %02X", rx_msg.byte[i]);
+            }
             printf("\n\r");
         }
+        //_delay_ms(1000);
+
     }
     
 }

@@ -239,7 +239,7 @@ int main(void)
 
     //menu_init();
 
-    test_loop();
+    //test_loop();
 
     //test_loop_int();
   
@@ -265,13 +265,14 @@ void test_nodes_communication(void){
         CanFrame tx = {
             .id  = 0x123,
             .dlc = 3,
-            .data = { 0x11, 0x22, counter }
+            .data = { 0x11, 0x60, counter }
         };
     
-        //printf("Sending CAN frame...\n");
+        printf("Sending CAN frame...\n");
         CAN_send(&tx);
         counter++;
-        
+        printf("Counter: %d\n", counter);
+
         _delay_ms(1000);
     }
 }
