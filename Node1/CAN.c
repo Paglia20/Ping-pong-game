@@ -94,7 +94,6 @@ bool CAN_receive(CanFrame* out)
         out->data[i] = MCP_read((uint8_t)(RXB0D0 + i));
     }
 
-    MCP_clear_interrupt_flags(MCP_RX0IF);
     return true;
 }
 
@@ -106,6 +105,8 @@ ISR(INT1_vect)
         CanFrame rx;
 
         CAN_receive(&rx);
+        MCP_clear_interrupt_flags(MCP_RX0IF);
+
 
         //handle received frame
 

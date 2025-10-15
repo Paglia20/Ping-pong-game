@@ -189,15 +189,19 @@ void test_loop_int(void){
     GICR  |= (1<<INT1);
     sei();
 
-    CanFrame tx = {
-        .id  = 0x123,
-        .dlc = 3,
-        .data = { 0x11, 0x22, 0x33 }
-    };
-    CAN_send(&tx);
+    uint8_t counter = 0;
 
-    while (DEBUG_CAN) {
-        //wait for interrupt
+    while (1){
+        CanFrame tx = {
+            .id  = 0x123,
+            .dlc = 3,
+            .data = { 0x11, 0x60, counter }
+        };
+    
+        CAN_send(&tx);
+        counter++;
+
+        _delay_ms(1000);
     }
 }
 
@@ -261,11 +265,13 @@ void test_nodes_communication(void){
 
     uint8_t counter = 0;
 
+    int run = 1;
+
     while (1){
         CanFrame tx = {
             .id  = 0x123,
             .dlc = 3,
-            .data = { 0x11, 0x60, counter }
+            .data = { 0x41, 0x60, counter }
         };
     
         printf("Sending CAN frame...\n");
@@ -274,6 +280,8 @@ void test_nodes_communication(void){
         printf("Counter: %d\n", counter);
 
         _delay_ms(1000);
+        run = 0;
+
     }
 }
 

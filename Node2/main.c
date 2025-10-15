@@ -31,7 +31,7 @@ int main()
     printf("Hello World\n\r");
 
     // 125 kbps, must match Node 1
-    uint32_t can_br = 0x00290165;  // lab sheet value
+    uint32_t can_br = 0x00210754;  // lab sheet value
     CanInit cfg;
     cfg.reg = can_br;
     can_init(cfg, 0);

@@ -109,7 +109,9 @@ uint8_t can_rx(CanMsg* m){
                 
     // Reset for new receive
     CAN0->CAN_MB[rxMailbox].CAN_MMR = CAN_MMR_MOT_MB_RX;
-    CAN0->CAN_MB[rxMailbox].CAN_MCR |= CAN_MCR_MTCR;
+    CAN0->CAN_MB[rxMailbox].CAN_MCR = CAN_MCR_MTCR;
+
+
     return 1;
 }
     
