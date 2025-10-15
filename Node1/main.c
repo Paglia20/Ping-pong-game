@@ -244,7 +244,36 @@ int main(void)
     //test_loop_int();
   
     // test_cs();
+
+
+    test_nodes_communication();
+
     return 0;   
+}
+
+
+void test_nodes_communication(void){
+    if (DEBUG_CAN) {
+        printf("MCP2515 normal mode start...\n");
+    }
+
+    CAN_init_normal_125k_4M9();
+
+    uint8_t counter = 0;
+
+    while (1){
+        CanFrame tx = {
+            .id  = 0x123,
+            .dlc = 3,
+            .data = { 0x11, 0x22, counter }
+        };
+    
+        //printf("Sending CAN frame...\n");
+        CAN_send(&tx);
+        counter++;
+        
+        _delay_ms(1000);
+    }
 }
 
 void test_cs(void){

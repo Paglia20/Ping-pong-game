@@ -12,6 +12,8 @@
  * apt or your favorite package manager.
  */
 #include "uart.h"
+#include "can_controller.h"
+#include "can.h"
 
 int main()
 {
@@ -29,9 +31,23 @@ int main()
     uart_init(F_CPU, 115200);
     printf("Hello World\n\r");
 
+    // 125 kbps, must match Node 1
+    uint32_t can_br = 0x00290165;  // lab sheet value
+    can_init_def_tx_rx_mb(can_br);
+
+    printf("CAN initialized.\n\r");
+
+    CAN_MESSAGE rx_msg;
+
     while (1)
     {
-        /* code */
+        if (can_receive(&rx_msg, 1) == 0)
+        {
+            printf("RX ID=0x%03X LEN=%d DATA:", rx_msg.id, rx_msg.data_length);
+            for (uint8_t i = 0; i < rx_msg.data_length; i++)
+                printf(" %02X", rx_msg.data[i]);
+            printf("\n\r");
+        }
     }
     
 }
