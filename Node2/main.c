@@ -27,9 +27,24 @@ int main()
     PIOB ->PIO_SODR |= PIO_PB12; 
 
     // //clock out
-    // PMC ->PMC_PCER0 |= (1 << ID_PIOB);
-    // PMC -> PMC_SCER |= PMC_SCER_PCK0; //enable programmable clock 0
-    // PMC -> PMC_PCK[0] = PMC_PCK_CSS_MAIN_CLK | PMC_PCK_PRES_CLK_1;
+    PMC->PMC_PCER0 |= (1 << ID_PIOB);
+
+    // Configure PCK0: source = Master Clock (MCK), no prescaler
+    PMC->PMC_PCK[0] = PMC_PCK_CSS_MCK | PMC_PCK_PRES(0);
+    PMC->PMC_SCER |= PMC_SCER_PCK0; // Enable PCK0
+
+    // Wait for the clock to be ready
+    while (!(PMC->PMC_SR & PMC_SR_PCKRDY0));
+
+    // --- Route PCK0 to PB27 (Arduino pin 13) ---
+    // Peripheral B function on PB27 → PCK0
+    const uint32_t PB27 = (1u << 27);  // Bit mask for PB27
+
+    // Select peripheral B for PB27 (set bit in ABSR)
+    PIOB->PIO_ABSR |= PB27;
+
+    // Disable PIO control so peripheral can drive the pin
+    PIOB->PIO_PDR  |= PB27;
 
 
     //Uncomment after including uart above
