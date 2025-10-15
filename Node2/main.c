@@ -26,12 +26,18 @@ int main()
     PIOB ->PIO_OER |= PIO_PB12; 
     PIOB ->PIO_SODR |= PIO_PB12; 
 
+    // //clock out
+    // PMC ->PMC_PCER0 |= (1 << ID_PIOB);
+    // PMC -> PMC_SCER |= PMC_SCER_PCK0; //enable programmable clock 0
+    // PMC -> PMC_PCK[0] = PMC_PCK_CSS_MAIN_CLK | PMC_PCK_PRES_CLK_1;
+
+
     //Uncomment after including uart above
     uart_init(F_CPU, 115200);
     printf("Hello World\n\r");
 
     // 125 kbps, must match Node 1
-    uint32_t can_br = 0x00210754;  // lab sheet value
+    uint32_t can_br = 0x00053255;  // lab sheet value
     CanInit cfg;
     cfg.reg = can_br;
     can_init(cfg, 0);

@@ -32,7 +32,7 @@ void CAN_init_loopback_125k_4M9(void)
     MCP_set_mode(MODE_LOOPBACK);
 }
 
-void CAN_init_normal_125k_4M9(void)
+void CAN_init_normal_500k_4M9(void)
 {
     MCP_init();                 
     MCP_reset();
