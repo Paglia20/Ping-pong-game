@@ -280,7 +280,7 @@ void test_nodes_communication(void){
         printf("Sending CAN frame...\n");
         CAN_send(&tx);
         counter++;
-        printf("Counter: %d\n", counter);
+        printf("Counter: %X\n", counter);
 
         _delay_ms(1000);
         run = 0;

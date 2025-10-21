@@ -12,7 +12,10 @@
  * apt or your favorite package manager.
  */
 #include "uart.h"
-#include "can.h"
+#include "can_controller.h"
+
+#define FREQ 84000000
+#define BAUD 250000
 
 int main()
 {   
@@ -26,10 +29,10 @@ int main()
     PIOB ->PIO_OER |= PIO_PB12; 
     PIOB ->PIO_SODR |= PIO_PB12; 
 
-    //Enable clock for test should be 84MHz
-    PMC->PMC_PCER0 = (1u << ID_PIOA);  // enable PIOA clock
-    PIOA->PIO_PDR   = PIO_PDR_P1;      // disable PIO control -> peripheral takes pin
-    PIOA->PIO_ABSR |= PIO_ABSR_P1;     // select Peripheral B for PA1 (B=1 => PCK0 on PA1)
+    //Enablecan_cfg clock for test should be 84MHz
+    PMC->PMC_PCER0 = (1u << ID_PIOB);  
+    PIOA->PIO_PDR   = PIO_PDR_P26;     
+    PIOA->PIO_ABSR |= PIO_ABSR_P26;    
 
     //PCK0 source = MCK, prescaler = 2 (PRES=CLK_2).
     PMC->PMC_PCK[0] = PMC_PCK_CSS_MCK | PMC_PCK_PRES_CLK_2;  // MCK/2 = 42 MHz
@@ -40,27 +43,24 @@ int main()
     uart_init(F_CPU, 115200);
     printf("Hello World\n\r");
 
+
+    uint8_t BRP = (FREQ / (16*BAUD)) - 1; // Baud Rate Prescaler
+
     // 500 kbps at 84 MHz
-    CanInit can_cfg = {
-        .phase2 = 6,
-        .propag = 1, //supponendo 20 cm di can
-        .phase1 = 6,
-        .sjw = 3,
-        .brp = 10,
-        .smp = 0, 
-    };
-    can_init(can_cfg, 0);
+    
+    uint32_t reg = ((0<<24) | (BRP<<16) | (3<<12) | (1<<8) | (6<<4) | 5);
+    can_init_def_tx_rx_mb(reg);
 
     printf("CAN initialized.\n\r");
 
-    CanMsg rx_msg;
+    CAN_MESSAGE rx_msg;
 
     while (1)
     {
-        if (can_rx(&rx_msg) == 1) {
-            printf("RX ID=0x%03X LEN=%d DATA:", rx_msg.id, rx_msg.length);
-            for (uint8_t i = 0; i < rx_msg.length; i++){
-                printf(" %02X", rx_msg.byte[i]);
+        if (can_receive(&rx_msg, 0) == 0) {
+            printf("RX ID=0x%03X LEN=%d DATA:", rx_msg.id, rx_msg.data_length);
+            for (uint8_t i = 0; i < rx_msg.data_length; i++){
+                printf(" %02X", rx_msg.data[i]);
             }
             printf("\n\r");
         }
