@@ -26,8 +26,8 @@ typedef struct Joystick{
     volatile int16_t y_zero;
     volatile int16_t x_val;
     volatile int16_t y_val;
-    volatile int16_t x_val_perc;
-    volatile int16_t y_val_perc;
+    volatile int8_t x_val_perc;
+    volatile int8_t y_val_perc;
     volatile Direction dir;
     volatile bool button;
 } Joystick;

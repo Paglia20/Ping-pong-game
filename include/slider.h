@@ -7,7 +7,7 @@
 typedef struct {
     volatile int16_t x_zero;
     volatile int16_t x_val;
-    volatile int16_t x_val_perc;
+    volatile int8_t x_val_perc;
 } Slider;
 
 extern Slider slider;

@@ -318,8 +318,7 @@ void send_joystick_data_over_can(void){
         update_slider();
 
 
-        //these are 16!!!!
-        uint8_t slider_x= slider.x_val;
+        uint8_t slider_x= slider.x_val_perc;
 
         uint8_t joy_x_perc = joystick.x_val_perc;
         uint8_t joy_y_perc = joystick.y_val_perc;

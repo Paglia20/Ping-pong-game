@@ -18,13 +18,13 @@
 //min and max x from testing
 //min and max y from testing
 #define X_MIN 68
-#define X_MAX 247
+#define X_MAX 248
 #define Y_MIN 65
 #define Y_MAX 249
 
 Joystick joystick;
 
-static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max);
+static inline int8_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max);
 static inline Direction dir_from_xy(int16_t x_perc, int16_t y_perc);
 
 static inline void adc_read_avg(uint8_t samples, uint8_t *out_x, uint8_t *out_y) {
@@ -107,15 +107,15 @@ void calibrate(void) {
 }
 
 
-static inline int16_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max) {
+static inline int8_t percent_axis(uint8_t val, uint8_t zero, uint8_t min, uint8_t max) {
     if (val >= zero) {
         uint16_t num = (uint16_t)(val - zero) * 100u;
         uint16_t den = (uint16_t)(max - zero);
-        return den ? (int16_t)(num / den) : 0;
+        return den ? (int8_t)(num / den) : 0;
     } else {
         uint16_t num = (uint16_t)(zero - val) * 100u;
         uint16_t den = (uint16_t)(zero - min);
-        return den ? -(int16_t)(num / den) : 0;
+        return den ? -(int8_t)(num / den) : 0;
     }
 }
 

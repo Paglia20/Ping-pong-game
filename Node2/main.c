@@ -17,9 +17,7 @@
 #define FREQ 84000000
 #define BAUD 250000
 
-
-
-int16_t convert_to_signed(uint16_t val) {
+int8_t convert_to_signed(uint16_t val) {
     if (val <= 32767)
         return (int16_t)val;
     else
@@ -78,10 +76,10 @@ int main()
             printf("RX ID=0x%03X LEN=%d DATA (X , Y, Slider):", rx_msg.id, rx_msg.data_length);
             for (uint8_t i = 0; i < rx_msg.data_length; i++){
                 int val = convert_to_signed(rx_msg.data[i]);
-                if (val > 100){
+                if (val > 101){ 
                     val -= 256;
                 }
-                printf(" %03d", rx_msg.data[i]);
+                printf(" %03d", val);
             }
             printf("\n\r");
         }
