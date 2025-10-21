@@ -21,21 +21,35 @@ int main()
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
     //set high servo pin
-    PMC ->PMC_PCER0 |= (1 << ID_PIOB); 
+    PMC ->PMC_PCER0 = (1 << ID_PIOB); 
     PIOB ->PIO_PER |= PIO_PB12;
     PIOB ->PIO_OER |= PIO_PB12; 
     PIOB ->PIO_SODR |= PIO_PB12; 
 
+    //Enable clock for test should be 84MHz
+    PMC->PMC_PCER0 = (1u << ID_PIOA);  // enable PIOA clock
+    PIOA->PIO_PDR   = PIO_PDR_P1;      // disable PIO control -> peripheral takes pin
+    PIOA->PIO_ABSR |= PIO_ABSR_P1;     // select Peripheral B for PA1 (B=1 => PCK0 on PA1)
 
-    //Uncomment after including uart above
+    //PCK0 source = MCK, prescaler = 2 (PRES=CLK_2).
+    PMC->PMC_PCK[0] = PMC_PCK_CSS_MCK | PMC_PCK_PRES_CLK_2;  // MCK/2 = 42 MHz
+    PMC->PMC_SCER = PMC_SCER_PCK0;
+    while ((PMC->PMC_SR & PMC_SR_PCKRDY0) == 0) {}
+
+    
     uart_init(F_CPU, 115200);
     printf("Hello World\n\r");
 
-    // 500 kbps, must match Node 1
-    uint32_t can_br = 0x000D1242;  // lab sheet value
-    CanInit cfg;
-    cfg.reg = can_br;
-    can_init(cfg, 0);
+    // 500 kbps at 84 MHz
+    CanInit can_cfg = {
+        .phase2 = 6,
+        .propag = 1, //supponendo 20 cm di can
+        .phase1 = 6,
+        .sjw = 3,
+        .brp = 10,
+        .smp = 0, 
+    };
+    can_init(can_cfg, 0);
 
     printf("CAN initialized.\n\r");
 
@@ -50,8 +64,6 @@ int main()
             }
             printf("\n\r");
         }
-        //_delay_ms(1000);
-
     }
     
 }

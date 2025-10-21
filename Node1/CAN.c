@@ -11,7 +11,7 @@ static inline uint16_t regs_to_id(uint8_t sidh, uint8_t sidl) {
     return (uint16_t)((sidh << 3) | (sidl >> 5));
 }
 
-void CAN_init_loopback_125k_4M9(void)
+void CAN_init_loopback(void)
 {
     MCP_init();                 // set CS/INT pins, init SPI  (no reset here)
     MCP_reset();                // now CS is an output → reset works
@@ -37,10 +37,17 @@ void CAN_init_normal_500k_16(void)
     MCP_init();                 
     MCP_reset();
 
-    MCP_write(MCP_CNF1, 0xC0);   
-    MCP_write(MCP_CNF2, 0xAA);   
-    MCP_write(MCP_CNF3, 0x05);  
+    MCP_write(MCP_CNF1, 0xC0);   //  4 x TQ, TQ = 2 x (BRP + 1)/FOSC = 2/16MHz = 0.125us
+    MCP_write(MCP_CNF2, 0xAA);
+    //Length of PS2 determined by PHSEG2 bits of CNF3
+    //Bus line is sampled once at the sample point
+    //PS1 Length bits = (PHSEG1 + 1) x TQ, PHSEG1 = 5 -> PS1 = 6 TQ
+    // Propagation Segment Length bits = (PRSEG + 1) x TQ = 3 TQ
 
+    MCP_write(MCP_CNF3, 0x05);   // PHSEG2=5 (PS2=6)
+    // tot 16 TQ: 1(SJW) + 3(PRSEG) + 6(PS1) + 6(PS2) = 16 TQ = 2us -> 500 kbps
+
+    
     // Accetta tutto su RXB0/RXB1 (RXM=11)
     MCP_write(MCP_RXB0CTRL, 0x60);
     MCP_write(MCP_RXB1CTRL, 0x60);

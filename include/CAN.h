@@ -22,7 +22,7 @@ typedef struct {
 } CanFrame;
 
 // init: reset, bit-timing per ~125 kbps @ 4.9 MHz, accept-all, loopback
-void CAN_init_loopback_125k_4M9(void);
+void CAN_init_loopback(void);
 
 // send one frame using TXB0
 bool CAN_send(const CanFrame* f);
@@ -31,7 +31,6 @@ bool CAN_send(const CanFrame* f);
 bool CAN_receive(CanFrame* out);
 
 void CAN_init_normal_500k_16(void);
-
 
 
 

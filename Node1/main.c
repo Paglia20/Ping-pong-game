@@ -151,7 +151,7 @@ void test_loop(void){
         printf("MCP2515 loopback  start...\n");
     }
 
-    CAN_init_loopback_125k_4M9();
+    CAN_init_loopback();
     
     CanFrame tx = {
         .id  = 0x123,
@@ -182,7 +182,7 @@ void test_loop_int(void){
         printf("MCP2515 loopback with int...\n");
     }
 
-    CAN_init_loopback_125k_4M9();
+    CAN_init_loopback();
 
 
     MCUCR = (MCUCR & ~((1<<ISC11)|(1<<ISC10))) | (1<<ISC11);  // falling edge
@@ -252,6 +252,9 @@ int main(void)
 
     test_nodes_communication();
 
+    //send_joystick_data_over_can();
+
+
     return 0;   
 }
 
@@ -302,3 +305,31 @@ void test_cs(void){
     _delay_ms(1000);
     }
 }
+
+
+// void send_joystick_data_over_can(void){
+//     calibrate();
+//     calibrate_slider();
+
+//     CAN_init_normal_500k_16();
+
+//     while (1)
+//     {
+//         update_joystick();
+//         update_slider();
+
+//         uint8_t joy_x = joystick.x_val;
+//         uint8_t joy_y = joystick.y_val;
+//         uint8_t slider_x= slider.x_val;
+
+//         CanFrame tx = {
+//             .id  = 0x111,
+//             .dlc = 3,
+//             .data = {joy_x, joy_y, slider_x}
+//         };
+
+//         CAN_send(&tx);
+
+//         _delay_ms(100);
+//     }
+// }
