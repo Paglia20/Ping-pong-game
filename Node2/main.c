@@ -13,15 +13,19 @@
  */
 #include "uart.h"
 #include "can_controller.h"
+#include "../include/joystick.h"
 
 #define FREQ 84000000
 #define BAUD 250000
 
-int8_t convert_to_signed(uint16_t val) {
-    if (val <= 32767)
-        return (int16_t)val;
-    else
-        return (int16_t)(val - 65536);
+const char* decode_dir(uint8_t val) {
+    switch (val) {
+        case 0x01: return direction_str[0];
+        case 0x02: return direction_str[1];
+        case 0x03: return direction_str[2];
+        case 0x04: return direction_str[3];
+        default:   return direction_str[4];
+    }
 }
 
 int main()
@@ -73,13 +77,10 @@ int main()
     while (1)
     {
         if (can_receive(&rx_msg, 0) == 0) {
-            printf("RX ID=0x%03X LEN=%d DATA (X , Y, Slider):", rx_msg.id, rx_msg.data_length);
+            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
             for (uint8_t i = 0; i < rx_msg.data_length; i++){
-                int val = convert_to_signed(rx_msg.data[i]);
-                if (val > 101){ 
-                    val -= 256;
-                }
-                printf(" %03d", val);
+                const char* val = decode_dir(rx_msg.data[i]);
+                printf(" %s", val);
             }
             printf("\n\r");
         }

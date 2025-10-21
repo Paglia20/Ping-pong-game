@@ -27,6 +27,16 @@
 #include <avr/interrupt.h>
 
 
+uint8_t encode_direction(Direction dir){
+    switch (dir) {
+        case UP:       return 0x01;
+        case DOWN:     return 0x02;
+        case LEFT:     return 0x03;
+        case RIGHT:    return 0x04;
+        default:       return 0x00; // NEUTRAL
+    }
+}
+
 void pulse_ALE(void)
 {
     // Genera un impulso basso-alto-basso su PE1 per latchare i dati
@@ -318,15 +328,12 @@ void send_joystick_data_over_can(void){
         update_slider();
 
 
-        uint8_t slider_x= slider.x_val_perc;
-
-        uint8_t joy_x_perc = joystick.x_val_perc;
-        uint8_t joy_y_perc = joystick.y_val_perc;
+        uint8_t dir = encode_direction(joystick.dir);
 
         CanFrame tx = {
             .id  = 0x111,
-            .dlc = 3,
-            .data = {joy_x_perc, joy_y_perc, slider_x}
+            .dlc = 1,
+            .data = {dir}
         };
 
         CAN_send(&tx);

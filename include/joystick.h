@@ -20,6 +20,10 @@ typedef enum Direction{
     NEUTRAL
 } Direction;
 
+const char* direction_str[] = {
+    "UP", "DOWN", "LEFT", "RIGHT", "NEUTRAL"
+};
+
 // Joystick and slider position structure
 typedef struct Joystick{
     volatile int16_t x_zero;
