@@ -249,10 +249,9 @@ int main(void)
   
     // test_cs();
 
+    //test_nodes_communication();
 
-    test_nodes_communication();
-
-    //send_joystick_data_over_can();
+    send_joystick_data_over_can();
 
 
     return 0;   
@@ -318,14 +317,17 @@ void send_joystick_data_over_can(void){
         update_joystick();
         update_slider();
 
-        uint8_t joy_x = joystick.x_val;
-        uint8_t joy_y = joystick.y_val;
+
+        //these are 16!!!!
         uint8_t slider_x= slider.x_val;
+
+        uint8_t joy_x_perc = joystick.x_val_perc;
+        uint8_t joy_y_perc = joystick.y_val_perc;
 
         CanFrame tx = {
             .id  = 0x111,
             .dlc = 3,
-            .data = {joy_x, joy_y, slider_x}
+            .data = {joy_x_perc, joy_y_perc, slider_x}
         };
 
         CAN_send(&tx);
