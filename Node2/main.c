@@ -46,9 +46,17 @@ int main()
 
     uint8_t BRP = (FREQ / (16*BAUD)) - 1; // Baud Rate Prescaler
 
-    // 500 kbps at 84 MHz
-    
+    //spiega questi valori
     uint32_t reg = ((0<<24) | (BRP<<16) | (3<<12) | (1<<8) | (6<<4) | 5);
+    // SMP = 0 single sampling
+    // BRP = BRP (computed)
+    // SJW = 3  → 4 TQ
+    // PROPAG = 1 → 2 TQ
+    // PHASE1 = 6 → 7 TQ
+    // PHASE2 = 5 → 6 TQ
+
+
+    
     can_init_def_tx_rx_mb(reg);
 
     printf("CAN initialized.\n\r");

@@ -3,6 +3,14 @@
 #include "../include/CAN.h"
 #include <avr/interrupt.h>   
 
+
+#define FREQ 16000000UL
+#define BAUD 250000UL
+#define N_TQ 16UL
+
+#define BRP   ((FREQ / (2UL * N_TQ * BAUD)) - 1)   // 1 with the values above
+
+
 static inline void id_to_regs(uint16_t id, uint8_t* sidh, uint8_t* sidl) {
     *sidh = (uint8_t)(id >> 3);
     *sidl = (uint8_t)((id & 0x07) << 5);   // standard frame, no extended
@@ -32,37 +40,49 @@ void CAN_init_loopback(void)
     MCP_set_mode(MODE_LOOPBACK);
 }
 
-#define FREQ 16000000
-#define BAUD 250000
 
-void CAN_init_normal_500k_16(void)
+void CAN_init_normal_16TQ(void)
 {
-    MCP_init();                 
+    MCP_init();
     MCP_reset();
 
+    /*
+    === Bit timing (MCP2515) ===
+    CNF1 = SJW4 | BRP
+      - SJW = 4 TQ  (max resynchronization jump)
+      - BRP = BRP_reg (macro above already computed “-1” for the register field)
 
-    uint8_t BRP = FREQ / (2*16*BAUD); // Baud Rate Prescaler
-    MCP_write(MCP_CNF1, SJW4 | (BRP-1));   //  4 x TQ, TQ = 2 x (BRP + 1)/FOSC = 2/16MHz = 0.125us
-    MCP_write(MCP_CNF2, BTLMODE| SAMPLE_3X | (6<<3)| 1);
-    //Length of PS2 determined by PHSEG2 bits of CNF3
-    //Bus line is sampled once at the sample point
-    //PS1 Length bits = (PHSEG1 + 1) x TQ, PHSEG1 = 5 -> PS1 = 6 TQ
-    // Propagation Segment Length bits = (PRSEG + 1) x TQ = 3 TQ
+    CNF2 = BTLMODE | SAMPLE_3X | (PHSEG1=6) | (PRSEG=1)
+      - BTLMODE=1 → PS2 taken from CNF3
+      - SAMPLE_3X → triple sampling (helpful on noisy/slow edges)
+      - PS1  = (PHSEG1+1) = 7 TQ
+      - PROP = (PRSEG+1) = 2 TQ
 
-    MCP_write(MCP_CNF3, WAKFIL_DISABLE | 5);   // PHSEG2=5 (PS2=6)
-    // tot 16 TQ: 1(SJW) + 3(PRSEG) + 6(PS1) + 6(PS2) = 16 TQ = 2us -> 500 kbps
+    CNF3 = WAKFIL_DISABLE | (PHSEG2=5)
+      - PS2 = (PHSEG2+1) = 6 TQ
+      - Wake-up filter disabled (normal mode)
 
-    
-    // // Accetta tutto su RXB0/RXB1 (RXM=11)
-    // MCP_write(MCP_RXB0CTRL, 0x60);
-    // MCP_write(MCP_RXB1CTRL, 0x60);
+    -> Total TQ per bit: 1 (Sync) + 2 (Prop) + 7 (PS1) + 6 (PS2) = 16 TQ
+       Sample point: (1+2+7)/16 = 10/16 = 62.5%
+
+    === Actual bit rate with the defines above ===
+    BitRate = FOSC / (2 * (BRP+1) * N_TQ)
+            = 16,000,000 / (2 * (1+1) * 16)
+            = 16,000,000 / 64
+            = 250,000 bit/s   ← correct
+    */
+
+    MCP_write(MCP_CNF1, SJW4 | (uint8_t)(BRP));          // BRP is already the register value (…-1)
+    MCP_write(MCP_CNF2, BTLMODE | SAMPLE_3X | (6<<3) | 1);
+    MCP_write(MCP_CNF3, WAKFIL_DISABLE | 5);
 
     MCP_clear_interrupt_flags(0xFF);
     MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);
     MCP_clear_interrupt_flags(0xFF);
 
-    MCP_set_mode(MODE_NORMAL);   
+    MCP_set_mode(MODE_NORMAL);
 }
+
 
 bool CAN_send(const CanFrame* f)
 {
