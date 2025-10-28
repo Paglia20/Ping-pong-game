@@ -7,9 +7,10 @@
 #include "../include/joystick.h"
 #include "interrupt.h"
 
+extern const char* direction_str[];
 
-extern volatile uint32_t ball_count = 0;
-extern volatile uint32_t prev_count = 0;
+extern volatile uint32_t ball_count;
+extern volatile uint32_t prev_count;
 
 #define BAUD 250000
 

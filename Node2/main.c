@@ -10,13 +10,27 @@
 
 #include "main.h"
 
-//adding guards
+volatile uint32_t ball_count = 0;
+volatile uint32_t prev_count = 0;
+
+const char* direction_str[] = {
+    "UP", "DOWN", "LEFT", "RIGHT", "NEUTRAL"
+};
+
 static inline void servo_write(uint32_t ch, uint16_t us)
 {
     if (us < 900)  us = 900;     
     if (us > 2100) us = 2100;   
     PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
+
+    printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
+
 }
+
+const char* print_dir(uint8_t val);
+
+Direction decode_dir(uint8_t val);
+
 
 int main()
 {   
@@ -56,11 +70,10 @@ int main()
     //Disable channel during setup
     PWM->PWM_DIS = PWM_DIS_CHID1;
 
-    // 3) Set Channel 1 to use CLKA
+    // Set Channel 1 to use CLKA
     PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84); // CLKA = MCK / DIVA * 2^PREA = 1 MHz
     PWM->PWM_CH_NUM[1].PWM_CMR  = PWM_CMR_CPRE_CLKA;  
 
-    // 4) Set 50 Hz period and mid-position duty
     PWM->PWM_CH_NUM[1].PWM_CPRD = 20000;              // 20 ms
     PWM->PWM_CH_NUM[1].PWM_CDTY = 1500;               // inside 0.9 ms - 2.1 ms
 
@@ -145,7 +158,6 @@ int main()
 
         }
 
-        printf("servo: %d\n\r", PWM->PWM_CH_NUM[1].PWM_CDTYUPD);
 
         if (ball_count > prev_count) {
             printf("GOL! score: %d\n\r", ball_count);
@@ -153,4 +165,24 @@ int main()
         }
     }
 
+}
+
+Direction decode_dir(uint8_t val) {
+    switch (val) {
+        case 0x01: return UP;
+        case 0x02: return DOWN;
+        case 0x03: return LEFT;
+        case 0x04: return RIGHT;
+        default:   return NEUTRAL;
+    }
+}
+
+const char* print_dir(uint8_t val) {
+    switch (val) {
+        case 0x01: return direction_str[0];
+        case 0x02: return direction_str[1];
+        case 0x03: return direction_str[2];
+        case 0x04: return direction_str[3];
+        default:   return direction_str[4];
+    }
 }
