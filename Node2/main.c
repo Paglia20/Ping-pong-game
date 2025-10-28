@@ -118,28 +118,18 @@ int main()
 
     printf("CAN initialized.\n\r");
 
-    // // Interrupt for IR
-    // // but the signal has to go through Arduino ADC so is it fine like this?
-    // PMC->PMC_PCER0 |= (1u << ID_PIOA);     // clock a PIOA
-    // PIOA->PIO_PER  |= PIO_PER_P2;          // abilita controllo PIO su PA2
-    // PIOA->PIO_ODR  |= PIO_ODR_P2;          // input
-    // PIOA->PIO_PUER |= PIO_PUER_P2;         // pull-up interno (se il sensore open-collector)
-
-    // // todo: Glitch filter
-   
-
-    // // properties
-    // PIOA->PIO_AIMER = PIO_AIMER_P2;        // additional interrupt mode
-    // PIOA->PIO_ESR   = PIO_ESR_P2;          // edge sensitive
-    // PIOA->PIO_FELLSR = PIO_FELLSR_P2;      // falling edge
-    // PIOA->PIO_IER   = PIO_IER_P2;          // enable interrupt
-    // NVIC_EnableIRQ(PIOA_IRQn);
-
+    ir_adc_init();
 
     CAN_MESSAGE rx_msg;
 
     while (1)
-    {
+    {   
+        //test tresholds code
+        uint16_t sample = ADC->ADC_CDR[IR_ADC_CH] & 0x0FFF;
+        printf("%u\n", sample);
+        delay_ms(200);
+
+
         if (can_receive(&rx_msg, 0) == 0) {
             printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
             const char* val = print_dir(rx_msg.data[0]);
