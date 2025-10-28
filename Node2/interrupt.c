@@ -5,11 +5,11 @@
 
 volatile uint8_t  ir_beam_blocked = 0;     // 0 = beam present, 1 = blocked
 
-static volatile uint16_t TH_HI = 3000;     // above this = "beam present" 
-static volatile uint16_t TH_LO = 2600;     // below this = "beam blocked" 
+static volatile uint16_t TH_HI = 3200;     // above this = "beam present" 
+static volatile uint16_t TH_LO = 300;     // below this = "beam blocked" 
 
 static inline void adc_set_window(uint16_t low, uint16_t high) {
-    if (high <= low) high = low + 1;       // keep a valid window
+    if (high <= low) high = low + 1;      
     ADC->ADC_CWR = ADC_CWR_LOWTHRES(low) | ADC_CWR_HIGHTHRES(high);
 }
 
@@ -39,8 +39,8 @@ void ir_adc_init(void)
 
 
     // 5) Enable interrupt on compare event i will uncomment this AFTER TESTING THRESHOLDS
-    // ADC->ADC_IER = ADC_IER_COMPE;    // compare event
-    // NVIC_EnableIRQ(ADC_IRQn);
+    ADC->ADC_IER = ADC_IER_COMPE;    // compare event
+    NVIC_EnableIRQ(ADC_IRQn);
 
     // 6) Start free-run conversions
     ADC->ADC_CR = ADC_CR_START;
@@ -53,9 +53,6 @@ void ADC_Handler(void)
     if (isr & ADC_ISR_COMPE) {
         uint16_t s = ADC->ADC_CDR[IR_ADC_CH] & 0x0FFF;  // 12-bit sample
 
-        // Simple 2-level hysteresis:
-        // - If we think beam is PRESENT (ir_beam_blocked==0) and we go BELOW TH_LO → BLOCKED
-        // - If we think beam is BLOCKED (ir_beam_blocked==1) and we go ABOVE TH_HI → PRESENT
         if (!ir_beam_blocked) {
             if (s <= TH_LO) {
                 ir_beam_blocked = 1;

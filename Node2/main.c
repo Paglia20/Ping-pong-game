@@ -23,7 +23,7 @@ static inline void servo_write(uint32_t ch, uint16_t us)
     if (us > 2100) us = 2100;   
     PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
 
-    printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
+    //printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
 
 }
 
@@ -72,7 +72,7 @@ int main()
 
     // Set Channel 1 to use CLKA
     PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84); // CLKA = MCK / DIVA * 2^PREA = 1 MHz
-    PWM->PWM_CH_NUM[1].PWM_CMR  = PWM_CMR_CPRE_CLKA;  
+    PWM->PWM_CH_NUM[1].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
 
     PWM->PWM_CH_NUM[1].PWM_CPRD = 20000;              // 20 ms
     PWM->PWM_CH_NUM[1].PWM_CDTY = 1500;               // inside 0.9 ms - 2.1 ms
@@ -125,16 +125,15 @@ int main()
     while (1)
     {   
         //test tresholds code
-        uint16_t sample = ADC->ADC_CDR[IR_ADC_CH] & 0x0FFF;
-        printf("%u\n", sample);
-        delay_ms(200);
+        // uint16_t sample = ADC->ADC_CDR[IR_ADC_CH] & 0x0FFF;
+        // printf("%u\n", sample);
 
 
         if (can_receive(&rx_msg, 0) == 0) {
-            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
-            const char* val = print_dir(rx_msg.data[0]);
-            printf(" %s", val);
-            printf("\n\r");
+            // printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
+            // const char* val = print_dir(rx_msg.data[0]);
+            // printf(" %s", val);
+            // printf("\n\r");
 
 
             Direction dir = decode_dir(rx_msg.data[0]);
