@@ -47,4 +47,7 @@ void calibrate(void);
 
 void update_joystick(void);
 
+const char* print_dir(uint8_t val);
+Direction decode_dir(uint8_t val);
+
 #endif // JOYSTICK_H

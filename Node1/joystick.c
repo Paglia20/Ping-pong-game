@@ -147,5 +147,23 @@ void update_joystick(void){
 	
 }
 
+const char* print_dir(uint8_t val) {
+    switch (val) {
+        case 0x01: return direction_str[0];
+        case 0x02: return direction_str[1];
+        case 0x03: return direction_str[2];
+        case 0x04: return direction_str[3];
+        default:   return direction_str[4];
+    }
+}
 
+Direction decode_dir(uint8_t val) {
+    switch (val) {
+        case 0x01: return UP;
+        case 0x02: return DOWN;
+        case 0x03: return LEFT;
+        case 0x04: return RIGHT;
+        default:   return NEUTRAL;
+    }
+}
 
