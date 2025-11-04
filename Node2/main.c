@@ -27,12 +27,26 @@ static inline void servo_write(uint32_t ch, uint16_t us)
     PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
 
     //printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
-
 }
 
-const char* print_dir(uint8_t val);
+static inline void motor_write(uint32_t ch, uint8_t dir)
+{
+    if (dir == 0) {
+        // right = HIGH = set
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = 10000;             
 
-Direction decode_dir(uint8_t val);
+        PIOC -> PIO_SODR = (1u << 23);
+        
+    } else if (dir == 1) {
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = 10000;             
+
+        // left = LOW = clear
+        PIOC -> PIO_CODR = (1u << 23);
+    } else {
+        // center = disable both
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = 0;             
+    }
+}
 
 
 int main()
@@ -62,7 +76,7 @@ int main()
 
 
 
-    //PWM
+    // --- PWM SERVO channel 1 del PWM ---
     PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
     PMC->PMC_PCER1 |= (1 << (ID_PWM - 32));   //  PWM clock
 
@@ -82,13 +96,30 @@ int main()
 
     PWM->PWM_ENA = PWM_ENA_CHID1;
 
-    // Verify by measuring pulse width using the capture and cursor functions.
+
+    // ---   PWM MOTOR channel 0 ---
+    PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
+    PMC->PMC_PCER1 |= (1u << (ID_PWM - 32));   //  PWM clock
+
+    PIOB->PIO_PDR   = PIO_PDR_P12;              // disable GPIO control
+    PIOB->PIO_ABSR |= PIO_ABSR_P12;             // select Peripheral B (PWMH1)
+
+    //Disable channel during setup
+    PWM->PWM_DIS = PWM_DIS_CHID0;
+
+    PWM->PWM_CH_NUM[0].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
+
+    PWM->PWM_CH_NUM[0].PWM_CPRD = 20000;              // 20 ms
+    PWM->PWM_CH_NUM[0].PWM_CDTY = 10000;               //motor speed
+
+    PWM->PWM_ENA = PWM_ENA_CHID0;
 
 
-    //CDTYUPD register is used to update the duty cycle on the fly
-    // 0°   → PWM->PWM_CH_NUM[0].PWM_CDTYUPD = 1000;   // 1.0 ms - 5% (duty cycle)
-    // 90°  → PWM->PWM_CH_NUM[0].PWM_CDTYUPD = 1500;   // 1.5 ms - 7,5%
-    // 180° → PWM->PWM_CH_NUM[0].PWM_CDTYUPD = 2000;   // 2.0 ms - 10%
+    // --- pc23 for phase init ---
+    PMC->PMC_PCER0 |= (1u << ID_PIOC);    
+    PIOC->PIO_PER = (1u << 23);    
+    PIOC->PIO_OER = (1u << 23);    
+
     
     uart_init(F_CPU, 115200);
 
@@ -123,11 +154,10 @@ int main()
 
     ir_adc_init();
 
+    qdec_tc2_init();
+
     CAN_MESSAGE rx_msg;
 
-
-    //The datasheet’s Figure 36-15 shows A=TIOA0, B=TIOB0 per TC block; for TC2 those become TIOA6, TIOB6 ￼
-    qdec_tc2_init();
 
     while (1)
     {   
@@ -153,9 +183,12 @@ int main()
             switch (dir) {
                 case UP:    servo_write(1, 1000); break;  // 0°
                 case DOWN:  servo_write(1, 2000); break;  // 180°
-                case LEFT:  servo_write(1, 1500); break;  // 90° (example)
-                case RIGHT: servo_write(1, 1500); break;  // 90° (example)
-                default:    servo_write(1, 1500); break;  // center
+                case LEFT:  motor_write(0, 1); break;  // 90° (example)
+                case RIGHT: motor_write(0, 0); break;  // 90° (example)
+                default:    { 
+                                servo_write(1, 1500);
+                                motor_write(0, 2); 
+                            } break;  // center
             }
 
         }
@@ -168,7 +201,9 @@ int main()
 
 
         int32_t pos = qdec_tc2_get_position();
-        printf("QDEC position: %ld\n\r", pos);
+        // printf("QDEC position: %ld\n\r", pos);
+
+        /* i will use it*/
     }
 
 }
@@ -193,15 +228,18 @@ const char* print_dir(uint8_t val) {
     }
 }
 
+//The datasheet’s Figure 36-15 shows A=TIOA0, B=TIOB0 per TC block; for TC2 those become TIOA6, TIOB6 ￼
+void qdec_tc2_init(void) {
 
-void qdec_tc2_init() {
+    PMC->PMC_PCER0 |= (1u << ID_PIOC);
 
     //Route PC25/PC26(/PC29) to peripheral B (TC2)
     PIOC->PIO_PDR = PIN_TIOA6 | PIN_TIOB6;   // hand pins to peripheral
     PIOC->PIO_ABSR |= PIN_TIOA6 | PIN_TIOB6; // select B function
 
-    //Enable TC2 peripheral clock (Peripheral ID 29 lives in PCER0)
-    PMC->PMC_PCER0 = (1u << ID_TC2);
+    //Enable TC2 peripheral clock 
+    PMC->PMC_PCER1 |= (1u << (ID_TC6 - 32));
+
 
     // Configure TC2 in Quadrature Decoder mode
     //    – QDEN   : enable quadrature decoding
@@ -215,13 +253,11 @@ void qdec_tc2_init() {
         TC_BMR_MAXFILT(3);   // adjust 0..63 as needed (filter = (MAXFILT+1) * t_periph)
 
 
-    // In QDEC clock source is XC0, Start channels 0 and 1 
+    // In QDEC clock source is XC0, Start channels 0 
     TC2->TC_CHANNEL[0].TC_CMR = TC_CMR_TCCLKS_XC0;  
-    TC2->TC_CHANNEL[1].TC_CMR = TC_CMR_TCCLKS_XC0;
 
     // Enable + trigger (reset to zero on SWTRG)
     TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
-    TC2->TC_CHANNEL[1].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
 }
 
 int32_t qdec_tc2_get_position(void) {

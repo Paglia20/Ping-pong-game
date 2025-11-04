@@ -12,5 +12,14 @@ extern const char* direction_str[];
 extern volatile uint32_t ball_count;
 extern volatile uint32_t prev_count;
 
+
+const char* print_dir(uint8_t val);
+
+Direction decode_dir(uint8_t val);
+
+void qdec_tc2_init();
+int32_t qdec_tc2_get_position(void);
+
+
 #define BAUD 250000
 
