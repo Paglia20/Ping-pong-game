@@ -7,6 +7,11 @@
 #include "../include/joystick.h"
 #include "interrupt.h"
 
+
+#define PIN_TIOA6   (1u << 25)  // PC25
+#define PIN_TIOB6   (1u << 26)  // PC26
+
+
 extern const char* direction_str[];
 
 extern volatile uint32_t ball_count;

@@ -6,7 +6,7 @@
 volatile uint8_t  ir_beam_blocked = 0;     // 0 = beam present, 1 = blocked
 
 static volatile uint16_t TH_HI = 3200;     // above this = "beam present" 
-static volatile uint16_t TH_LO = 300;     // below this = "beam blocked" 
+static volatile uint16_t TH_LO = 1000;     // below this = "beam blocked" 
 
 static inline void adc_set_window(uint16_t low, uint16_t high) {
     if (high <= low) high = low + 1;      
@@ -18,14 +18,17 @@ void ir_adc_init(void)
     // 1) Enable ADC peripheral clock
     PMC->PMC_PCER1 |= (1u << (ID_ADC - 32));
 
+    ADC->ADC_IDR = 0xFFFFFFFF; // disable all interrupts
+    NVIC_DisableIRQ(ADC_IRQn);
+
     //    ADC clock ~10.5 MHz (<=20 MHz), free-run, decent track/transfer/startup
     ADC->ADC_MR =
         ADC_MR_PRESCAL(3)       |   // ADCclk = MCK / ((PRESCAL+1)*2) -> 84/(4*2)=10.5 MHz
         ADC_MR_STARTUP_SUT64    |   // startup time
-        ADC_MR_TRACKTIM(3)      |   // tracking cycles
-        ADC_MR_TRANSFER(2)      |   // transfer cycles
-        ADC_MR_FREERUN_ON;          // free-running conversions
-
+        ADC_MR_TRACKTIM(10)      |   // tracking cycles
+        ADC_MR_TRANSFER(3)      |   // transfer cycles
+        ADC_MR_FREERUN_ON|         // free-running conversions
+        0;
 
     ADC->ADC_CHER = IR_ADC_CH_MASK; // 43.5.3
 
@@ -48,6 +51,9 @@ void ir_adc_init(void)
 
 void ADC_Handler(void)
 {
+    static uint8_t lo_cnt = 0, hi_cnt = 0;
+    const uint8_t DEBOUNCE_COUNT = 3;
+
     uint32_t isr = ADC->ADC_ISR;
 
     if (isr & ADC_ISR_COMPE) {
@@ -55,15 +61,27 @@ void ADC_Handler(void)
 
         if (!ir_beam_blocked) {
             if (s <= TH_LO) {
-                ir_beam_blocked = 1;
-                ball_count++;
+                if (++lo_cnt >= DEBOUNCE_COUNT) {
+                    ir_beam_blocked = 1;
+                    lo_cnt = 0;
+                    hi_cnt = 0;
+                    ball_count++;
+                }
+               
+            } else {
+                lo_cnt = 0;
             }
         } else {
             if (s >= TH_HI) {
-                ir_beam_blocked = 0;
+                if (++hi_cnt >= DEBOUNCE_COUNT) {
+                    ir_beam_blocked = 0;
+                    lo_cnt = 0;
+                    hi_cnt = 0;
+                }
+            } else {
+                hi_cnt = 0;
             }
         }
-        ADC->ADC_CWR = ADC_CWR_LOWTHRES(TH_LO) | ADC_CWR_HIGHTHRES(TH_HI);
     }
 }
 

@@ -10,9 +10,6 @@
 
 #include "main.h"
 
-#define PIN_TIOA6   (1u << 25)  // PC25
-#define PIN_TIOB6   (1u << 26)  // PC26
-
 volatile uint32_t ball_count;
 volatile uint32_t prev_count;
 
@@ -76,7 +73,7 @@ int main()
 
 
 
-    // --- PWM SERVO channel 1 del PWM ---
+    // --- PWM SERVO channel 1 del PWM ---choose edge phase (
     PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
     PMC->PMC_PCER1 |= (1 << (ID_PWM - 32));   //  PWM clock
 
@@ -163,7 +160,7 @@ int main()
     {   
         //test tresholds code
         // uint16_t sample = ADC->ADC_CDR[IR_ADC_CH] & 0x0FFF;
-        // printf("%u\n", sample);
+        // printf("%u\n\r", sample);
 
 
         if (can_receive(&rx_msg, 0) == 0) {
@@ -244,7 +241,7 @@ void qdec_tc2_init(void) {
     // Configure TC2 in Quadrature Decoder mode
     //    – QDEN   : enable quadrature decoding
     //    – POSEN  : position enabled (counter on ch.0)
-    //    – EDGPHA : choose edge phase (A leads B vs B leads A); flip if direction feels inverted
+    //    – EDGPHA : A leads B
     //    – MAXFILT: small digital filter to reject bounce/noise on A/B
     TC2->TC_BMR =
         TC_BMR_QDEN      |
