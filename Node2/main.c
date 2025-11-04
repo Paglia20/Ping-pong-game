@@ -10,8 +10,8 @@
 
 #include "main.h"
 
-volatile uint32_t ball_count = 0;
-volatile uint32_t prev_count = 0;
+volatile uint32_t ball_count;
+volatile uint32_t prev_count;
 
 const char* direction_str[] = {
     "UP", "DOWN", "LEFT", "RIGHT", "NEUTRAL"
@@ -135,6 +135,12 @@ int main()
             // printf(" %s", val);
             // printf("\n\r");
 
+            if (rx_msg.id == 0x100) {
+                    ball_count = 0;
+                    prev_count = 0;
+            } else if (rx_msg.id != 0x111) {
+                continue;   // ignore other messages
+            }
 
             Direction dir = decode_dir(rx_msg.data[0]);
             switch (dir) {

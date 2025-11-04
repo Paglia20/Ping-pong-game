@@ -322,6 +322,17 @@ void send_joystick_data_over_can(void){
 
     CAN_init_normal_16TQ();
 
+    //start transmission with 0x100
+    CanFrame tx = {
+           .id  = 0x100,
+           .dlc = 1,
+           .data = {0x00}
+    };
+
+    CAN_send(&tx);
+
+    _delay_ms(100);
+
     while (1)
     {
         update_joystick();
@@ -335,6 +346,9 @@ void send_joystick_data_over_can(void){
             .dlc = 1,
             .data = {dir}
         };
+
+
+        // printf("Sending direction:code: %02X)\n\r", dir);
 
         CAN_send(&tx);
 
