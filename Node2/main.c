@@ -10,6 +10,9 @@
 
 #include "main.h"
 
+#define PIN_TIOA6   (1u << 25)  // PC25
+#define PIN_TIOB6   (1u << 26)  // PC26
+
 volatile uint32_t ball_count;
 volatile uint32_t prev_count;
 
@@ -122,6 +125,10 @@ int main()
 
     CAN_MESSAGE rx_msg;
 
+
+    //The datasheet’s Figure 36-15 shows A=TIOA0, B=TIOB0 per TC block; for TC2 those become TIOA6, TIOB6 ￼
+    qdec_tc2_init();
+
     while (1)
     {   
         //test tresholds code
@@ -158,6 +165,10 @@ int main()
             printf("GOL! score: %d\n\r", ball_count);
             prev_count = ball_count;
         }
+
+
+        int32_t pos = qdec_tc2_get_position();
+        printf("QDEC position: %ld\n\r", pos);
     }
 
 }
@@ -180,4 +191,39 @@ const char* print_dir(uint8_t val) {
         case 0x04: return direction_str[3];
         default:   return direction_str[4];
     }
+}
+
+
+void qdec_tc2_init() {
+
+    //Route PC25/PC26(/PC29) to peripheral B (TC2)
+    PIOC->PIO_PDR = PIN_TIOA6 | PIN_TIOB6;   // hand pins to peripheral
+    PIOC->PIO_ABSR |= PIN_TIOA6 | PIN_TIOB6; // select B function
+
+    //Enable TC2 peripheral clock (Peripheral ID 29 lives in PCER0)
+    PMC->PMC_PCER0 = (1u << ID_TC2);
+
+    // Configure TC2 in Quadrature Decoder mode
+    //    – QDEN   : enable quadrature decoding
+    //    – POSEN  : position enabled (counter on ch.0)
+    //    – EDGPHA : choose edge phase (A leads B vs B leads A); flip if direction feels inverted
+    //    – MAXFILT: small digital filter to reject bounce/noise on A/B
+    TC2->TC_BMR =
+        TC_BMR_QDEN      |
+        TC_BMR_POSEN     |
+        TC_BMR_EDGPHA    |
+        TC_BMR_MAXFILT(3);   // adjust 0..63 as needed (filter = (MAXFILT+1) * t_periph)
+
+
+    // In QDEC clock source is XC0, Start channels 0 and 1 
+    TC2->TC_CHANNEL[0].TC_CMR = TC_CMR_TCCLKS_XC0;  
+    TC2->TC_CHANNEL[1].TC_CMR = TC_CMR_TCCLKS_XC0;
+
+    // Enable + trigger (reset to zero on SWTRG)
+    TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+    TC2->TC_CHANNEL[1].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
+}
+
+int32_t qdec_tc2_get_position(void) {
+    return (int32_t)TC2->TC_CHANNEL[0].TC_CV;
 }
