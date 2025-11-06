@@ -19,35 +19,7 @@ const char* direction_str[] = {
     "UP", "DOWN", "LEFT", "RIGHT", "NEUTRAL"
 };
 
-static inline void servo_write(uint32_t ch, uint16_t us)
-{
-    if (us != PWM->PWM_CH_NUM[ch].PWM_CDTYUPD) {
-        if (us < 900)  us = 900;     
-        if (us > 2100) us = 2100;   
-        PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
-    }
 
-    //printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
-}
-
-static inline void motor_write(uint32_t ch, uint8_t dir)
-{
-    if (dir == 0) {
-        // right = HIGH = set
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 13000;             
-
-        PIOC -> PIO_SODR = (1u << 23);
-        
-    } else if (dir == 1) {
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 13000;             
-
-        // left = LOW = clear
-        PIOC -> PIO_CODR = (1u << 23);
-    } else {
-        // center = disable both
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 0;             
-    }
-}
 
 
 int main()
@@ -158,8 +130,9 @@ int main()
     CAN_MESSAGE rx_msg;
 
     ir_enable = 1;
+    printf("ciao\n\r");
 
-    encode_init();
+    //encode_init();
 
 
     while (1)
@@ -188,17 +161,17 @@ int main()
                 continue;   // ignore other messages
             }
 
-            // Direction dir = decode_dir(rx_msg.data[0]);
-            // switch (dir) {
-            //     case UP:    servo_write(1, 1000); break;  // 0°
-            //     case DOWN:  servo_write(1, 2000); break;  // 180°
-            //     case LEFT:  motor_write(0, 1); break;  // 90° (example)
-            //     case RIGHT: motor_write(0, 0); break;  // 90° (example)
-            //     default:    { 
-            //                     servo_write(1, 1500);
-            //                     motor_write(0, 2); 
-            //                 } break;  // center
-            // }
+            Direction dir = decode_dir(rx_msg.data[0]);
+            switch (dir) {
+                case UP:    servo_write(1, 1000); break;  // 0°
+                case DOWN:  servo_write(1, 2000); break;  // 180°
+                case LEFT:  motor_write(0, 1); break;  // 90° (example)
+                case RIGHT: motor_write(0, 0); break;  // 90° (example)
+                default:    { 
+                                servo_write(1, 1500);
+                                motor_write(0, 2); 
+                            } break;  // center
+            }
 
             encoder_movement(rx_msg.data[1], rx_msg.data[2]);
 
@@ -211,6 +184,10 @@ int main()
             //stop motors
             ir_enable = 0;
         }
+
+        // int32_t pos = qdec_tc2_get_position();
+        // printf("encoder pos: %ld\n\r",pos);
+
     }
 
 }

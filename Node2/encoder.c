@@ -3,6 +3,7 @@
 volatile int32_t right_pos = 0;
 volatile int32_t left_pos = 0;
 
+
 //The datasheet’s Figure 36-15 shows A=TIOA0, B=TIOB0 per TC block; for TC2 those become TIOA6, TIOB6 ￼
 void qdec_tc2_init(void) {
 
@@ -46,30 +47,31 @@ int32_t qdec_tc2_get_position(void) {
 void encode_init(void) {
     
     qdec_tc2_init();
-    int32_t pos = qdec_tc2_get_position();
-    int32_t prev_pos = pos - 1;
-
-    //put motor to right;
-    while (pos > prev_pos) {
-        prev_pos = pos;
+    
+    //motor to right
+    uint16_t calibration_steps = CAL_VALUE;
+    while (calibration_steps > 0) {
         motor_write(0, 0); //right movement
-        pos = qdec_tc2_get_position();
+        calibration_steps--;
+        printf("cal right \n\r");
+
     }
+    right_pos = qdec_tc2_get_position();
 
-    right_pos = pos;
-    prev_pos = pos + 1;
 
-    //put motor to left;
-    while (pos < prev_pos) {
-        prev_pos = pos;
+    calibration_steps = 2 * CAL_VALUE;
+    while (calibration_steps > 0) {
         motor_write(0, 1); //left movement
-        pos = qdec_tc2_get_position();
-    }
+        calibration_steps--;
+        printf("cal left \n\r");
 
-    left_pos = pos;
+    }
+    left_pos = qdec_tc2_get_position;
+
+    int32_t pos = qdec_tc2_get_position();
 
     //center
-    middle = (left_pos + right_pos) / 2;
+    int32_t middle = (left_pos + right_pos) / 2;
     while (pos < middle || pos > middle) {
         pos = qdec_tc2_get_position();
         if (pos < middle) {
