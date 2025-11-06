@@ -7,6 +7,8 @@
 #include "../include/joystick.h"
 #include "interrupt.h"
 #include "time.h"
+#include "encoder.h"
+
 
 
 #define PIN_TIOA6   (1u << 25)  // PC25
@@ -17,6 +19,9 @@ extern const char* direction_str[];
 
 extern volatile uint32_t ball_count;
 extern volatile uint32_t prev_count;
+
+static inline void servo_write(uint32_t ch, uint16_t us);
+static inline void motor_write(uint32_t ch, uint8_t dir);
 
 
 const char* print_dir(uint8_t val);
