@@ -22,9 +22,9 @@ const char* direction_str[] = {
 static inline void servo_write(uint32_t ch, uint16_t us)
 {
     if (us != PWM->PWM_CH_NUM[ch].PWM_CDTYUPD) {
-            if (us < 900)  us = 900;     
-            if (us > 2100) us = 2100;   
-            PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
+        if (us < 900)  us = 900;     
+        if (us > 2100) us = 2100;   
+        PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
     }
 
     //printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
@@ -155,11 +155,11 @@ int main()
 
     ir_adc_init();
 
-    qdec_tc2_init();
-
     CAN_MESSAGE rx_msg;
 
     ir_enable = 1;
+
+    encode_init();
 
 
     while (1)
@@ -188,20 +188,21 @@ int main()
                 continue;   // ignore other messages
             }
 
-            Direction dir = decode_dir(rx_msg.data[0]);
-            switch (dir) {
-                case UP:    servo_write(1, 1000); break;  // 0°
-                case DOWN:  servo_write(1, 2000); break;  // 180°
-                case LEFT:  motor_write(0, 1); break;  // 90° (example)
-                case RIGHT: motor_write(0, 0); break;  // 90° (example)
-                default:    { 
-                                servo_write(1, 1500);
-                                motor_write(0, 2); 
-                            } break;  // center
-            }
+            // Direction dir = decode_dir(rx_msg.data[0]);
+            // switch (dir) {
+            //     case UP:    servo_write(1, 1000); break;  // 0°
+            //     case DOWN:  servo_write(1, 2000); break;  // 180°
+            //     case LEFT:  motor_write(0, 1); break;  // 90° (example)
+            //     case RIGHT: motor_write(0, 0); break;  // 90° (example)
+            //     default:    { 
+            //                     servo_write(1, 1500);
+            //                     motor_write(0, 2); 
+            //                 } break;  // center
+            // }
+
+            encoder_movement(rx_msg.data[1], rx_msg.data[2]);
 
         }
-
 
         if ((ball_count > prev_count) && (ir_enable == 1)) {
             printf("GOL! score: %d\n\r", ball_count);
@@ -209,15 +210,7 @@ int main()
 
             //stop motors
             ir_enable = 0;
-
-
         }
-
-
-        int32_t pos = qdec_tc2_get_position();
-        // printf("QDEC position: %ld\n\r", pos);
-
-        /* i will use it*/
     }
 
 }
@@ -242,38 +235,4 @@ const char* print_dir(uint8_t val) {
     }
 }
 
-//The datasheet’s Figure 36-15 shows A=TIOA0, B=TIOB0 per TC block; for TC2 those become TIOA6, TIOB6 ￼
-void qdec_tc2_init(void) {
 
-    PMC->PMC_PCER0 |= (1u << ID_PIOC);
-
-    //Route PC25/PC26(/PC29) to peripheral B (TC2)
-    PIOC->PIO_PDR = PIN_TIOA6 | PIN_TIOB6;   // hand pins to peripheral
-    PIOC->PIO_ABSR |= PIN_TIOA6 | PIN_TIOB6; // select B function
-
-    //Enable TC2 peripheral clock 
-    PMC->PMC_PCER1 |= (1u << (ID_TC6 - 32));
-
-
-    // Configure TC2 in Quadrature Decoder mode
-    //    – QDEN   : enable quadrature decoding
-    //    – POSEN  : position enabled (counter on ch.0)
-    //    – EDGPHA : A leads B
-    //    – MAXFILT: small digital filter to reject bounce/noise on A/B
-    TC2->TC_BMR =
-        TC_BMR_QDEN      |
-        TC_BMR_POSEN     |
-        TC_BMR_EDGPHA    |
-        TC_BMR_MAXFILT(3);   // adjust 0..63 as needed (filter = (MAXFILT+1) * t_periph)
-
-
-    // In QDEC clock source is XC0, Start channels 0 
-    TC2->TC_CHANNEL[0].TC_CMR = TC_CMR_TCCLKS_XC0;  
-
-    // Enable + trigger (reset to zero on SWTRG)
-    TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_CLKEN | TC_CCR_SWTRG;
-}
-
-int32_t qdec_tc2_get_position(void) {
-    return (int32_t)TC2->TC_CHANNEL[0].TC_CV;
-}
