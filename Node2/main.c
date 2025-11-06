@@ -132,7 +132,7 @@ int main()
     ir_enable = 1;
     printf("ciao\n\r");
 
-    //encode_init();
+    encode_init();
 
 
     while (1)
@@ -143,7 +143,7 @@ int main()
 
         if (!ir_enable) {
             servo_write(1, 1500);
-            motor_write(0, 2); 
+            motor_write(0, 2, 0); 
         }
 
 
@@ -165,11 +165,11 @@ int main()
             switch (dir) {
                 case UP:    servo_write(1, 1000); break;  // 0°
                 case DOWN:  servo_write(1, 2000); break;  // 180°
-                case LEFT:  motor_write(0, 1); break;  // 90° (example)
-                case RIGHT: motor_write(0, 0); break;  // 90° (example)
+                case LEFT:  motor_write(0, 1, 13000); break;  // 90° (example)
+                case RIGHT: motor_write(0, 0, 13000); break;  // 90° (example)
                 default:    { 
                                 servo_write(1, 1500);
-                                motor_write(0, 2); 
+                                motor_write(0, 2, 0); 
                             } break;  // center
             }
 

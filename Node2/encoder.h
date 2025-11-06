@@ -11,7 +11,9 @@
 
 #define PIN_TIOA6   (1u << 25)  // PC25
 #define PIN_TIOB6   (1u << 26)  // PC26
-#define CAL_VALUE   10    //number of steps to move during calibration
+#define NUDGE   8   
+#define CENTER_TOL   8  
+#define DEAD_BEND   4
 
 
 static inline void servo_write(uint32_t ch, uint16_t us)
@@ -25,16 +27,16 @@ static inline void servo_write(uint32_t ch, uint16_t us)
     //printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
 }
 
-static inline void motor_write(uint32_t ch, uint8_t dir)
-{
+static inline void motor_write(uint32_t ch, uint8_t dir, uint32_t speed)
+{   
     if (dir == 0) {
         // right = HIGH = set
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 13000;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = speed;             
 
         PIOC -> PIO_SODR = (1u << 23);
         
     } else if (dir == 1) {
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 13000;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = speed;             
 
         // left = LOW = clear
         PIOC -> PIO_CODR = (1u << 23);

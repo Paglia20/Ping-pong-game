@@ -49,42 +49,52 @@ void encode_init(void) {
     qdec_tc2_init();
     
     //motor to right
-    uint16_t calibration_steps = CAL_VALUE;
-    while (calibration_steps > 0) {
-        motor_write(0, 0); //right movement
-        calibration_steps--;
-        printf("cal right \n\r");
-
-    }
+    printf("cal right \n\r");
+    motor_write(0, 0, 15000); //right movement
+    time_spinFor(msecs(1000));
     right_pos = qdec_tc2_get_position();
 
 
-    calibration_steps = 2 * CAL_VALUE;
-    while (calibration_steps > 0) {
-        motor_write(0, 1); //left movement
-        calibration_steps--;
-        printf("cal left \n\r");
+    printf("cal left \n\r");
 
-    }
-    left_pos = qdec_tc2_get_position;
+    motor_write(0, 1, 15000); //left movement
+    time_spinFor(msecs(1000));
+    left_pos = qdec_tc2_get_position();
 
     int32_t pos = qdec_tc2_get_position();
 
     //center
     int32_t middle = (left_pos + right_pos) / 2;
-    while (pos < middle || pos > middle) {
-        pos = qdec_tc2_get_position();
-        if (pos < middle) {
-            motor_write(0, 0);
-        } else if (pos > middle) {
-            motor_write(0, 1);
-        }
-    }
-    motor_write(0, 2); //stop motor
 
-    qdec_tc2_init(); //reinitialize to reset position to 0
+    int32_t cur_pos = qdec_tc2_get_position();
+    int32_t error = middle - cur_pos;
+    //printf("error: %ld\n\r", error);
+
+
+    while (abs(error) > DEAD_BEND) {
+        cur_pos = qdec_tc2_get_position();
+        error = middle - cur_pos;
+        //printf("error: %ld\n\r", error);
+        if (error < CENTER_TOL) {
+            motor_write(0, 0, 8000); //right
+            time_spinFor(msecs(NUDGE));
+        } else if (error > -CENTER_TOL) {
+            motor_write(0, 1, 8000); //left
+            time_spinFor(msecs(NUDGE));
+        } else {
+            break;
+        }
+        time_spinFor(msecs(5));
+    }
+    
+    motor_write(0, 2, 0); //stop motor
+
+    TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_SWTRG;
     left_pos = - middle;
     right_pos = middle;
+
+    printf("cal done \n\r");
+    printf("left: %ld, right: %ld\n\r", left_pos, right_pos);
 }
 
 
