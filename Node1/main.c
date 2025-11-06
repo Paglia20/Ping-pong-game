@@ -215,58 +215,6 @@ void test_loop_int(void){
     }
 }
 
-int main(void)
-{
-
-    fflush(stdout);
-    // INITS
-    UART_init(F_CPU, BAUD); // 9600 8N1
-    XMEM_init();
-
-    // printf_P(PSTR("XMEM init done\n\r"));
-    // test_uart();
-
-    // TEST D LATCH
-    // test_dlatch();
-
-    // TEST SRAM
-
-    // dec_test();
-    // print_joystick();
-    //  SRAM_test();
-
-    // // Test ADC
-    adc_init();
-
-    //test_adc();
-    //test_joystick();
-    // test_slider();
-
-    SPI_init();
-
-    OLED_init();
-
-    //test_OLED();
-
-
-    //cursor_game();
-
-    //menu_init();
-
-    //test_loop();
-
-    //test_loop_int();
-  
-    // test_cs();
-
-    //test_nodes_communication();
-
-    send_joystick_data_over_can();
-
-
-    return 0;   
-}
-
 
 void test_nodes_communication(void){
     if (DEBUG_CAN) {
@@ -316,42 +264,55 @@ void test_cs(void){
 }
 
 
-void send_joystick_data_over_can(void){
-    calibrate();
-    calibrate_slider();
+int main(void)
+{
 
-    CAN_init_normal_16TQ();
+    fflush(stdout);
+    // INITS
+    UART_init(F_CPU, BAUD); // 9600 8N1
+    XMEM_init();
 
-    //start transmission with 0x100
-    CanFrame tx = {
-           .id  = 0x100,
-           .dlc = 1,
-           .data = {0x00}
-    };
+    // printf_P(PSTR("XMEM init done\n\r"));
+    // test_uart();
 
-    CAN_send(&tx);
+    // TEST D LATCH
+    // test_dlatch();
 
-    _delay_ms(100);
+    // TEST SRAM
 
-    while (1)
-    {
-        update_joystick();
-        update_slider();
+    // dec_test();
+    // print_joystick();
+    //  SRAM_test();
+
+    // // Test ADC
+    adc_init();
+
+    //test_adc();
+    //test_joystick();
+    // test_slider();
+
+    SPI_init();
+
+    OLED_init();
+
+    //test_OLED();
 
 
-        uint8_t dir = encode_direction(joystick.dir);
+    //cursor_game();
 
-        CanFrame tx = {
-            .id  = 0x111,
-            .dlc = 1,
-            .data = {dir}
-        };
+    menu_init();
+
+    //test_loop();
+
+    //test_loop_int();
+  
+    // test_cs();
+
+    //test_nodes_communication();
+
+    
 
 
-        // printf("Sending direction:code: %02X)\n\r", dir);
-
-        CAN_send(&tx);
-
-        _delay_ms(100);
-    }
+    return 0;   
 }
+

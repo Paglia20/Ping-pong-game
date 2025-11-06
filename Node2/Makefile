@@ -13,8 +13,8 @@ SOURCE_FILES = \
 	can.c \
 	can_interrupt.c \
 	can_controller.c \
-	interrupt.c
-
+	interrupt.c 
+	
 # Feel free to ignore anything below this line
 VPATH:= $(dir $(SOURCE_FILES))
 BUILD_DIR := build

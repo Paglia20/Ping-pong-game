@@ -6,6 +6,7 @@
 #include "can_controller.h"
 #include "../include/joystick.h"
 #include "interrupt.h"
+#include "time.h"
 
 
 #define PIN_TIOA6   (1u << 25)  // PC25

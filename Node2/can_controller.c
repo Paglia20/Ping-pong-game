@@ -150,7 +150,8 @@ uint8_t can_send(CAN_MESSAGE* can_msg, uint8_t tx_mb_id)
 	}
 	
 	else //Mailbox busy
-	{
+	{	
+		printf("CAN mailbox %d busy, message not sent\r\n", tx_mb_id);
 		return 1;
 	}
 	

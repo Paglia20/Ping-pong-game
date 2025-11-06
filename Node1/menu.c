@@ -4,10 +4,11 @@
 #include "../include/joystick.h"  
 #include "../include/cursor.h"
 #include "../include/board.h"
+#include "../include/game.h"
 #include <util/delay.h>
 #include <stdio.h> 
 
-int run = 1;
+int run_menu = 1;
 BoardButtons board;
 
 void test_action(void);
@@ -29,7 +30,7 @@ MenuItem submenu_items[3] = {
 };
 
 MenuItem main_menu_items[4] = {
-    {true, "Start",    NULL, cursor_game},
+    {true, "Start",    NULL, start_game},
     {true, "Settings & Tests", submenu_items, NULL},
     {true, "About",    NULL,  read_info},
     {true, "Power OFF",    NULL,  power_off}
@@ -51,7 +52,7 @@ void menu_init(void){
     selectedIndex = 0;
     draw_menu(currentMenu);
 
-    while (run) {
+    while (run_menu) {
         menu_loop();
     }
 }
@@ -114,7 +115,7 @@ void menu_select(void) {
     }
 
     if (selected_item->action) {
-        selected_item->action();   // run the callback
+        selected_item->action();   // run_menu the callback
         return;
     }
 
@@ -167,7 +168,7 @@ void back_action(void){
 void power_off(void){
     currentMenu = &mainMenu;
     selectedIndex = 0;
-    run = 0;
+    run_menu = 0;
     oled_clear();
 }
 

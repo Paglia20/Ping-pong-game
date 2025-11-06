@@ -12,6 +12,8 @@
 
 volatile uint32_t ball_count;
 volatile uint32_t prev_count;
+volatile uint8_t  ir_enable;    
+
 
 const char* direction_str[] = {
     "UP", "DOWN", "LEFT", "RIGHT", "NEUTRAL"
@@ -19,9 +21,11 @@ const char* direction_str[] = {
 
 static inline void servo_write(uint32_t ch, uint16_t us)
 {
-    if (us < 900)  us = 900;     
-    if (us > 2100) us = 2100;   
-    PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
+    if (us != PWM->PWM_CH_NUM[ch].PWM_CDTYUPD) {
+            if (us < 900)  us = 900;     
+            if (us > 2100) us = 2100;   
+            PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = us;
+    }
 
     //printf("servo: %d\n\r", PWM->PWM_CH_NUM[ch].PWM_CDTY);
 }
@@ -30,12 +34,12 @@ static inline void motor_write(uint32_t ch, uint8_t dir)
 {
     if (dir == 0) {
         // right = HIGH = set
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 10000;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = 13000;             
 
         PIOC -> PIO_SODR = (1u << 23);
         
     } else if (dir == 1) {
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 10000;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTY = 13000;             
 
         // left = LOW = clear
         PIOC -> PIO_CODR = (1u << 23);
@@ -107,7 +111,7 @@ int main()
     PWM->PWM_CH_NUM[0].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
 
     PWM->PWM_CH_NUM[0].PWM_CPRD = 20000;              // 20 ms
-    PWM->PWM_CH_NUM[0].PWM_CDTY = 10000;               //motor speed
+    PWM->PWM_CH_NUM[0].PWM_CDTY = 0;               //motor speed
 
     PWM->PWM_ENA = PWM_ENA_CHID0;
 
@@ -155,6 +159,8 @@ int main()
 
     CAN_MESSAGE rx_msg;
 
+    ir_enable = 1;
+
 
     while (1)
     {   
@@ -162,16 +168,22 @@ int main()
         // uint16_t sample = ADC->ADC_CDR[IR_ADC_CH] & 0x0FFF;
         // printf("%u\n\r", sample);
 
+        if (!ir_enable) {
+            servo_write(1, 1500);
+            motor_write(0, 2); 
+        }
+
 
         if (can_receive(&rx_msg, 0) == 0) {
-            // printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
-            // const char* val = print_dir(rx_msg.data[0]);
-            // printf(" %s", val);
-            // printf("\n\r");
+            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
+            const char* val = print_dir(rx_msg.data[0]);
+            printf(" %s", val);
+            printf("\n\r");
 
             if (rx_msg.id == 0x100) {
                     ball_count = 0;
                     prev_count = 0;
+                    ir_enable = 1;
             } else if (rx_msg.id != 0x111) {
                 continue;   // ignore other messages
             }
@@ -191,9 +203,14 @@ int main()
         }
 
 
-        if (ball_count > prev_count) {
+        if ((ball_count > prev_count) && (ir_enable == 1)) {
             printf("GOL! score: %d\n\r", ball_count);
             prev_count = ball_count;
+
+            //stop motors
+            ir_enable = 0;
+
+
         }
 
 

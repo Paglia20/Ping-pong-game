@@ -6,6 +6,8 @@
 
 #define MENU_STR_LEN 20
 
+extern int run_menu;
+
 typedef void (*MenuAction)(void);
 
 typedef struct MenuItem {

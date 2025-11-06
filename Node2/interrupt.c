@@ -52,7 +52,7 @@ void ir_adc_init(void)
 void ADC_Handler(void)
 {
     static uint8_t lo_cnt = 0, hi_cnt = 0;
-    const uint8_t DEBOUNCE_COUNT = 3;
+    const uint8_t DEBOUNCE_COUNT = 20;
 
     uint32_t isr = ADC->ADC_ISR;
 
