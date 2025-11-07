@@ -48,44 +48,9 @@ int main()
        while ((PMC->PMC_SR & PMC_SR_PCKRDY0) == 0) {} */
 
 
+    init_pmw_servo();
 
-    // --- PWM SERVO channel 1 del PWM ---choose edge phase (
-    PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
-    PMC->PMC_PCER1 |= (1 << (ID_PWM - 32));   //  PWM clock
-
-    // choosing PB13
-    PIOB->PIO_PDR   = PIO_PDR_P13;              // disable GPIO control
-    PIOB->PIO_ABSR |= PIO_ABSR_P13;             // select Peripheral B (PWMH1)
-
-    //Disable channel during setup
-    PWM->PWM_DIS = PWM_DIS_CHID1;
-
-    // Set Channel 1 to use CLKA
-    PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84); // CLKA = MCK / DIVA * 2^PREA = 1 MHz
-    PWM->PWM_CH_NUM[1].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
-
-    PWM->PWM_CH_NUM[1].PWM_CPRD = 20000;              // 20 ms
-    PWM->PWM_CH_NUM[1].PWM_CDTY = 1500;               // inside 0.9 ms - 2.1 ms
-
-    PWM->PWM_ENA = PWM_ENA_CHID1;
-
-
-    // ---   PWM MOTOR channel 0 ---
-    PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
-    PMC->PMC_PCER1 |= (1u << (ID_PWM - 32));   //  PWM clock
-
-    PIOB->PIO_PDR   = PIO_PDR_P12;              // disable GPIO control
-    PIOB->PIO_ABSR |= PIO_ABSR_P12;             // select Peripheral B (PWMH1)
-
-    //Disable channel during setup
-    PWM->PWM_DIS = PWM_DIS_CHID0;
-
-    PWM->PWM_CH_NUM[0].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
-
-    PWM->PWM_CH_NUM[0].PWM_CPRD = 20000;              // 20 ms
-    PWM->PWM_CH_NUM[0].PWM_CDTY = 0;               //motor speed
-
-    PWM->PWM_ENA = PWM_ENA_CHID0;
+    init_pmw_motor();
 
 
     // --- pc23 for phase init ---
@@ -130,10 +95,10 @@ int main()
     CAN_MESSAGE rx_msg;
 
     ir_enable = 1;
-    printf("ciao\n\r");
 
     encode_init();
-
+    control_timer_init(); 
+    printf("Encoder calibrated, control timer initialized.\n\r");
 
     while (1)
     {   
@@ -150,7 +115,7 @@ int main()
         if (can_receive(&rx_msg, 0) == 0) {
             printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
             const char* val = print_dir(rx_msg.data[0]);
-            printf(" %s", val);
+            printf(" %s, X: %d, Y: %d", val, rx_msg.data[1], rx_msg.data[2]);
             printf("\n\r");
 
             if (rx_msg.id == 0x100) {
@@ -165,15 +130,8 @@ int main()
             switch (dir) {
                 case UP:    servo_write(1, 1000); break;  // 0°
                 case DOWN:  servo_write(1, 2000); break;  // 180°
-                case LEFT:  motor_write(0, 1, 13000); break;  // 90° (example)
-                case RIGHT: motor_write(0, 0, 13000); break;  // 90° (example)
-                default:    { 
-                                servo_write(1, 1500);
-                                motor_write(0, 2, 0); 
-                            } break;  // center
+                default:    set_point(rx_msg.data[1]); break; 
             }
-
-            encoder_movement(rx_msg.data[1], rx_msg.data[2]);
 
         }
 
@@ -184,13 +142,55 @@ int main()
             //stop motors
             ir_enable = 0;
         }
-
-        // int32_t pos = qdec_tc2_get_position();
-        // printf("encoder pos: %ld\n\r",pos);
-
     }
 
 }
+
+void init_pmw_servo(void){
+    // --- PWM SERVO channel 1 del PWM ---choose edge phase (
+    PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
+    PMC->PMC_PCER1 |= (1 << (ID_PWM - 32));   //  PWM clock
+
+    // choosing PB13
+    PIOB->PIO_PDR   = PIO_PDR_P13;              // disable GPIO control
+    PIOB->PIO_ABSR |= PIO_ABSR_P13;             // select Peripheral B (PWMH1)
+
+    //Disable channel during setup
+    PWM->PWM_DIS = PWM_DIS_CHID1;
+
+    // Set Channel 1 to use CLKA
+    PWM->PWM_CLK = PWM_CLK_PREA(0) | PWM_CLK_DIVA(84); // CLKA = MCK / DIVA * 2^PREA = 1 MHz
+    PWM->PWM_CH_NUM[1].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
+
+    PWM->PWM_CH_NUM[1].PWM_CPRD = 20000;              // 20 ms
+    PWM->PWM_CH_NUM[1].PWM_CDTY = 1500;               // inside 0.9 ms - 2.1 ms
+
+    PWM->PWM_ENA = PWM_ENA_CHID1;
+}
+
+void init_pmw_motor(void){
+    // ---   PWM MOTOR channel 0 ---
+    PMC->PMC_PCER0 |= (1u << ID_PIOB);    //  PIOB manipulation
+    PMC->PMC_PCER1 |= (1u << (ID_PWM - 32));   //  PWM clock
+
+    PIOB->PIO_PDR   = PIO_PDR_P12;              // disable GPIO control
+    PIOB->PIO_ABSR |= PIO_ABSR_P12;             // select Peripheral B (PWMH0)
+
+    //Disable channel during setup
+    PWM->PWM_DIS = PWM_DIS_CHID0;
+
+    PWM->PWM_CH_NUM[0].PWM_CMR  = PWM_CMR_CPRE_CLKA | PWM_CMR_CPOL;  // to have high pulses
+
+    PWM->PWM_CH_NUM[0].PWM_CPRD = 20000;              // 20 ms
+    PWM->PWM_CH_NUM[0].PWM_CDTY = 0;               //motor speed
+
+    PWM->PWM_ENA = PWM_ENA_CHID0;
+}
+
+
+
+
+
 
 Direction decode_dir(uint8_t val) {
     switch (val) {

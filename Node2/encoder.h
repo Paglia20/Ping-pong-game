@@ -12,8 +12,7 @@
 #define PIN_TIOA6   (1u << 25)  // PC25
 #define PIN_TIOB6   (1u << 26)  // PC26
 #define NUDGE   8   
-#define CENTER_TOL   8  
-#define DEAD_BEND   4
+#define DEAD_BAND   4
 
 
 static inline void servo_write(uint32_t ch, uint16_t us)
@@ -31,22 +30,24 @@ static inline void motor_write(uint32_t ch, uint8_t dir, uint32_t speed)
 {   
     if (dir == 0) {
         // right = HIGH = set
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = speed;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = speed;             
 
         PIOC -> PIO_SODR = (1u << 23);
         
     } else if (dir == 1) {
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = speed;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = speed;             
 
         // left = LOW = clear
         PIOC -> PIO_CODR = (1u << 23);
     } else {
         // center = disable both
-        PWM->PWM_CH_NUM[ch].PWM_CDTY = 0;             
+        PWM->PWM_CH_NUM[ch].PWM_CDTYUPD = 0;             
     }
 }
 
 
 
 void encode_init();
-void encoder_movement(int8_t dir_x, int8_t dir_y);
+void set_point(int8_t dir_x);
+void control_timer_init(void);
+void update_motor(void);
