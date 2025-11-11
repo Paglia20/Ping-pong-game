@@ -12,7 +12,7 @@
 
 #define DEADZONE 20   
 #define CALIBRATION_VALUE 10   
-#define AVG_SAMPLES 2 // to average out noise
+#define AVG_SAMPLES 10 // to average out noise
 
 
 //min and max x from testing

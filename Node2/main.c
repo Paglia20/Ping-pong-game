@@ -130,7 +130,12 @@ int main()
             switch (dir) {
                 case UP:    servo_write(1, 1000); break;  // 0°
                 case DOWN:  servo_write(1, 2000); break;  // 180°
-                default:    set_point(rx_msg.data[1]); break; 
+                case NEUTRAL: servo_write(1, 1500); break;  // 90°
+                default:    {
+                    set_point(rx_msg.data[1]);
+                    servo_write(1, 1500);
+                
+                } break; 
             }
 
         }

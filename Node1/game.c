@@ -25,7 +25,7 @@ void start_game(void){
     while (!run_menu)
     {
         update_joystick();
-        update_slider();
+        //update_slider();
 
 
         uint8_t dir = encode_direction(joystick.dir);
