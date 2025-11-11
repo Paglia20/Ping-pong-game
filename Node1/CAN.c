@@ -76,8 +76,14 @@ void CAN_init_normal_16TQ(void)
     MCP_write(MCP_CNF2, BTLMODE | SAMPLE_3X | (6<<3) | 1);
     MCP_write(MCP_CNF3, WAKFIL_DISABLE | 5);
 
+    MCP_write(MCP_RXB0CTRL, 0x60);
+
+
+
     MCP_clear_interrupt_flags(0xFF);
-    MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);
+    //MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);
+
+    MCP_enable_interrupts(0x09); // RX0IE | TX1IE
     MCP_clear_interrupt_flags(0xFF);
 
     MCP_set_mode(MODE_NORMAL);
