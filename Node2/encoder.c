@@ -4,6 +4,9 @@ static int32_t right_limit = 0;
 static int32_t left_limit  = 0;
 static int32_t MAX_COUNTS  = 0;
 
+#define DUTY_MAX      20000
+#define I_ABS_MAX     15000.0f
+
 // Control state
 static volatile int32_t latest_setpoint = 0;   // written from CAN thread, read in ISR
 
@@ -126,63 +129,43 @@ void set_point(int8_t dir_x) {
 }
 
 
-void update_motor(void) {
-    const int DUTY_MAX = 20000;
+void update_motor(void)
+{
+    int32_t pos = qdec_tc2_get_position();
 
-    int32_t pos_actual = qdec_tc2_get_position();
-    int32_t err = latest_setpoint - pos_actual;
+    // Errore scelto per avere u > 0 ⇒ destra (dir=0), u < 0 ⇒ sinistra (dir=1)
+    int32_t err = pos - latest_setpoint;
 
-    // Dentro banda morta: stop e scarica un filo l’integrale per evitare drift
-    if (abs(err) <= DEAD_BAND) {
-        I *= 0.98f;                     // leak lento
-        if (fabsf(I) < 1.0f) I = 0.0f;  // snap to zero
+    // Banda morta: ferma e scarica lentamente l’integrale
+    if (err > -DEAD_BAND && err < DEAD_BAND) {
+        I *= 0.98f;
+        if (I > -1.0f && I < 1.0f) I = 0.0f;
         motor_write(0, 2, 0);
         return;
     }
 
-    // Proporzionale (solo err intero → float una volta sola)
-    float P = Kp * (float)err;
+    // ===== PI con EULER ESPLICITO sull’integrale =====
+    // I[k+1] = I[k] + Ts * err[k]
+    // (anti-windup: clamp e integrazione sempre, semplice e robusta; opz. condizionale se serve)
+    I += Ts * (float)err;
+    if (I >  I_ABS_MAX) I =  I_ABS_MAX;
+    if (I < -I_ABS_MAX) I = -I_ABS_MAX;
 
-    // Controllo provvisorio senza anti-windup
-    float u_noI = P;
-    float u_withI = u_noI + Ki * I;
-
-    // Saturazione “duty richiesta”
-    float u_cmd = u_withI;
-    if (u_cmd >  (float)DUTY_MAX) u_cmd = (float)DUTY_MAX;
-    if (u_cmd < -(float)DUTY_MAX) u_cmd = -(float)DUTY_MAX;
-
-    // === Conditional integration ===
-    // Calcola quale sarebbe il duty senza clamp per capire se sei saturo.
-    bool saturated_pos = (u_withI >  (float)DUTY_MAX);
-    bool saturated_neg = (u_withI < -(float)DUTY_MAX);
-
-    // Err con segno del comando: se saturo e l’integrale spingerebbe nella stessa direzione, NON integrare.
-    bool integrate;
-    if (saturated_pos)      integrate = ((float)err < 0); // integra solo se riduce u (errore < 0)
-    else if (saturated_neg) integrate = ((float)err > 0); // integra solo se riduce u (errore > 0)
-    else                    integrate = true;
-
-    if (integrate) {
-        I += Ts * (float)err;
-        // clamp integrale, più stretto del duty max per avere spazio al P
-        const float I_MAX = 15000.0f;
-        if (I >  I_MAX) I =  I_MAX;
-        if (I < -I_MAX) I = -I_MAX;
-    } else {
-        // piccola perdita quando saturo per evitare sticking
-        I *= 0.999f;
-    }
-
-    // Ricomputa il comando finale dopo l’eventuale aggiornamento di I
-    float u = Kp * (float)err + Ki * I;
+    float u = Kp * (float)err + Ki * I;   // sforzo di controllo
 
     int dir, duty;
     if (u >= 0.0f) { dir = 0; duty = (int)u; }   // 0 = destra
     else           { dir = 1; duty = (int)(-u); }// 1 = sinistra
 
+    // Saturazione hard
     if (duty > DUTY_MAX) duty = DUTY_MAX;
-    if (duty < 0)        duty = 0;
+
+    // Soft stop in prossimità dei limiti meccanici
+    duty = taper_duty_near_limits(dir, duty, pos);
+
+    // Ulteriore safety: se già oltre i limiti, non spingere verso l’esterno
+    if (pos >= left_limit  && dir == 1) duty = 0;  // a sinistra e chiedi più sinistra
+    if (pos <= right_limit && dir == 0) duty = 0;  // a destra e chiedi più destra
 
     motor_write(0, dir, duty);
 }
