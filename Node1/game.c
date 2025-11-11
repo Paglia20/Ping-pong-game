@@ -32,8 +32,8 @@ void start_game(void){
 
         CanFrame tx = {
             .id  = 0x111,
-            .dlc = 3,
-            .data = {dir, joystick.x_val_perc, joystick.y_val_perc}
+            .dlc = 4,
+            .data = {dir, joystick.x_val_perc, joystick.y_val_perc, (uint8_t) joystick.button}
         };
 
 

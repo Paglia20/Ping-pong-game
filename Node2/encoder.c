@@ -8,7 +8,7 @@ static int32_t MAX_COUNTS  = 0;
 static volatile int32_t latest_setpoint = 0;   // written from CAN thread, read in ISR
 
 // PI gains & timing
-static const float Kp = 0.8f;
+static const float Kp = 3.0f;
 static const float Ki = 0.10f;
 static const float Ts = 0.020f;                // 20 ms
 static float I = 0.0f;                     // integral accumulator
@@ -59,14 +59,14 @@ void encode_init(void) {
     //motor to right
     printf("cal right \n\r");
     motor_write(0, 0, 15000); //right movement
-    time_spinFor(msecs(1000));
+    time_spinFor(msecs(2000));
     right_limit = qdec_tc2_get_position();
 
 
     printf("cal left \n\r");
 
     motor_write(0, 1, 15000); //left movement
-    time_spinFor(msecs(1000));
+    time_spinFor(msecs(2000));
     left_limit = qdec_tc2_get_position();
 
     int32_t pos = qdec_tc2_get_position();
@@ -121,6 +121,8 @@ void set_point(int8_t dir_x) {
 
     int32_t sp = (int32_t)((dir_x / 100.0f) * MAX_COUNTS);
     latest_setpoint = sp;   // the 20ms control task will read this
+
+    // printf("Setpoint updated to %ld for dir_x %d\n\r", sp, dir_x);
 }
 
 
@@ -134,7 +136,7 @@ void update_motor(void) {
     }
     
     // parte integrale
-    I += (Ki * Ts) * (float)err;
+    I += (Ts) * (float)err;
 
     // clamp integral
     const float I_MAX = (float) 20000;
@@ -142,7 +144,7 @@ void update_motor(void) {
     if (I > I_MAX) I = I_MAX;
     if (I < I_MIN) I = I_MIN;
 
-    float u = Kp * (float)err + I;       // control effort (signed)
+    float u = Kp * (float)err + Ki * I;       // control effort (signed)
 
     int dir, duty;
     if (u >= 0.0f) { dir = 0; duty = (int)u; }    // 0=right
@@ -150,6 +152,8 @@ void update_motor(void) {
 
     if (duty > 20000) duty = 20000;      // saturate
     if (duty < 0) duty = 0;
+
+    printf("i: %f\r\n", I);
 
     motor_write(0, dir, duty);
 }
