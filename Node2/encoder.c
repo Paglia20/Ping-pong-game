@@ -51,18 +51,20 @@ int32_t qdec_tc2_get_position(void) {
     return (int32_t)TC2->TC_CHANNEL[0].TC_CV;
 }
 
+
 void encode_init(void) {
     
     qdec_tc2_init();
-
+    
     //motor to right
     printf("cal right \n\r");
     motor_write(0, 0, 15000); //right movement
     time_spinFor(msecs(1000));
     right_limit = qdec_tc2_get_position();
 
-    //motor to left
+
     printf("cal left \n\r");
+
     motor_write(0, 1, 15000); //left movement
     time_spinFor(msecs(1000));
     left_limit = qdec_tc2_get_position();
@@ -72,46 +74,44 @@ void encode_init(void) {
     //center
     int32_t middle = (left_limit + right_limit) / 2;
 
-    for (uint32_t watchdog = 0; watchdog < 200; watchdog++) {
-        int32_t cur_pos = qdec_tc2_get_position();
-        int32_t error   = middle - cur_pos;  // >0: go right, <0: go left
+    int32_t cur_pos = qdec_tc2_get_position();
+    int32_t error = middle - cur_pos;
+    //printf("error: %ld\n\r", error);
 
-        if (abs(error) <= DEAD_BAND) break;
 
-        if (error > 0) {
-            motor_write(0, 0, 8000);                 // go RIGHT
+    while (abs(error) > DEAD_BAND) {
+        cur_pos = qdec_tc2_get_position();
+        error = middle - cur_pos;
+        //printf("error: %ld\n\r", error);
+        if (error < DEAD_BAND) {
+            motor_write(0, 0, 8000); //right
             time_spinFor(msecs(NUDGE));
-            motor_write(0, 2, 0);                    // stop
+        } else if (error > -DEAD_BAND) {
+            motor_write(0, 1, 8000); //left
+            time_spinFor(msecs(NUDGE));
         } else {
-            motor_write(0, 1, 8000);                 // go LEFT
-            time_spinFor(msecs(NUDGE));
-            motor_write(0, 2, 0);                    // stop
+            break;
         }
-
-        time_spinFor(msecs(5));                      // small settle
+        time_spinFor(msecs(5));
     }
-    motor_write(0, 2, 0);                             // final stop
+    
+    motor_write(0, 2, 0); //stop motor
 
-    // Zero position at center
     TC2->TC_CHANNEL[0].TC_CCR = TC_CCR_SWTRG;
+    left_limit = - (middle - left_limit);
+    right_limit = right_limit - middle;
 
-
-    right_limit = right_limit - middle;  
-    left_limit  = left_limit  - middle; 
-    printf("cal done\n\rleft: %ld, right: %ld\n\r",
-        left_limit, right_limit);
+    printf("cal done \n\r");
+    printf("left: %ld, right: %ld\n\r", left_limit, right_limit);
 
 
     // usable travel with 5% margin
     int32_t max_mag = (abs(left_limit) < abs(right_limit)) ? abs(left_limit) : abs(right_limit);
     MAX_COUNTS = (int32_t)(0.95f * max_mag);
-
     // start at center
     latest_setpoint = 0;
     I = 0.0f;
-
 }
-
 
 
 void set_point(int8_t dir_x) {

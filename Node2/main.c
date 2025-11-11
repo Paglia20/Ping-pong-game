@@ -115,7 +115,7 @@ int main()
         if (can_receive(&rx_msg, 0) == 0) {
             printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
             const char* val = print_dir(rx_msg.data[0]);
-            printf(" %s, X: %d, Y: %d", val, rx_msg.data[1], rx_msg.data[2]);
+            printf(" %s , X: %d, Y: %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2]);
             printf("\n\r");
 
             if (rx_msg.id == 0x100) {
@@ -130,10 +130,10 @@ int main()
             switch (dir) {
                 case UP:    servo_write(1, 1000); break;  // 0°
                 case DOWN:  servo_write(1, 2000); break;  // 180°
-                case NEUTRAL: servo_write(1, 1500); break;  // 90°
+                //case NEUTRAL: servo_write(1, 1500); break;  // 90°
                 default:    {
-                    set_point(rx_msg.data[1]);
                     servo_write(1, 1500);
+                    set_point((int8_t) rx_msg.data[1]);
                 
                 } break; 
             }
