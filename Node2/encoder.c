@@ -127,37 +127,65 @@ void set_point(int8_t dir_x) {
 
 
 void update_motor(void) {
+    const int DUTY_MAX = 20000;
+
     int32_t pos_actual = qdec_tc2_get_position();
     int32_t err = latest_setpoint - pos_actual;
 
+    // Dentro banda morta: stop e scarica un filo l’integrale per evitare drift
     if (abs(err) <= DEAD_BAND) {
+        I *= 0.98f;                     // leak lento
+        if (fabsf(I) < 1.0f) I = 0.0f;  // snap to zero
         motor_write(0, 2, 0);
         return;
     }
-    
-    // parte integrale
-    I += (Ts) * (float)err;
 
-    // clamp integral
-    const float I_MAX = (float) 20000;
-    const float I_MIN = -(float) 20000;
-    if (I > I_MAX) I = I_MAX;
-    if (I < I_MIN) I = I_MIN;
+    // Proporzionale (solo err intero → float una volta sola)
+    float P = Kp * (float)err;
 
-    float u = Kp * (float)err + Ki * I;       // control effort (signed)
+    // Controllo provvisorio senza anti-windup
+    float u_noI = P;
+    float u_withI = u_noI + Ki * I;
+
+    // Saturazione “duty richiesta”
+    float u_cmd = u_withI;
+    if (u_cmd >  (float)DUTY_MAX) u_cmd = (float)DUTY_MAX;
+    if (u_cmd < -(float)DUTY_MAX) u_cmd = -(float)DUTY_MAX;
+
+    // === Conditional integration ===
+    // Calcola quale sarebbe il duty senza clamp per capire se sei saturo.
+    bool saturated_pos = (u_withI >  (float)DUTY_MAX);
+    bool saturated_neg = (u_withI < -(float)DUTY_MAX);
+
+    // Err con segno del comando: se saturo e l’integrale spingerebbe nella stessa direzione, NON integrare.
+    bool integrate;
+    if (saturated_pos)      integrate = ((float)err < 0); // integra solo se riduce u (errore < 0)
+    else if (saturated_neg) integrate = ((float)err > 0); // integra solo se riduce u (errore > 0)
+    else                    integrate = true;
+
+    if (integrate) {
+        I += Ts * (float)err;
+        // clamp integrale, più stretto del duty max per avere spazio al P
+        const float I_MAX = 15000.0f;
+        if (I >  I_MAX) I =  I_MAX;
+        if (I < -I_MAX) I = -I_MAX;
+    } else {
+        // piccola perdita quando saturo per evitare sticking
+        I *= 0.999f;
+    }
+
+    // Ricomputa il comando finale dopo l’eventuale aggiornamento di I
+    float u = Kp * (float)err + Ki * I;
 
     int dir, duty;
-    if (u >= 0.0f) { dir = 0; duty = (int)u; }    // 0=right
-    else           { dir = 1; duty = (int)(-u); } // 1=left
+    if (u >= 0.0f) { dir = 0; duty = (int)u; }   // 0 = destra
+    else           { dir = 1; duty = (int)(-u); }// 1 = sinistra
 
-    if (duty > 20000) duty = 20000;      // saturate
-    if (duty < 0) duty = 0;
-
-    //printf("i: %f\r\n", I);
+    if (duty > DUTY_MAX) duty = DUTY_MAX;
+    if (duty < 0)        duty = 0;
 
     motor_write(0, dir, duty);
 }
-
 
 
 void control_timer_init(void)
