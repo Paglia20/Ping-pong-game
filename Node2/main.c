@@ -125,7 +125,7 @@ int main()
         }
 
 
-        if (can_receive(&rx_msg, 0) == 0) {
+        if (can_receive(&rx_msg, 1) == 0) {
             printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
             const char* val = print_dir(rx_msg.data[0]);
             printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
@@ -168,6 +168,15 @@ int main()
 
             //stop motors
             ir_enable = 0;
+
+            CAN_MESSAGE tx = {
+                .id  = 0x01,
+                .data_length = 1,
+                .data = {0x01}
+            };
+
+            can_send(&tx, 0);
+
         }
     }
 

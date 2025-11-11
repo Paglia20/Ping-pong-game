@@ -91,16 +91,18 @@ bool CAN_send(const CanFrame* f)
     uint8_t sidh, sidl;
     id_to_regs(f->id, &sidh, &sidl);
 
-    MCP_write(TXB0SIDH, sidh);
-    MCP_write(TXB0SIDL, sidl);
-    MCP_write(TXB0DLC,  f->dlc & 0x0F);
+    MCP_write(TXB1SIDH, sidh);
+    MCP_write(TXB1SIDL, sidl);
+    MCP_write(TXB1DLC,  f->dlc & 0x0F);
 
     for (uint8_t i = 0; i < f->dlc; i++) {
-        MCP_write((uint8_t)(TXB0D0 + i), f->data[i]);
+        MCP_write((uint8_t)(TXB1D0 + i), f->data[i]);
     }
     
     //require transm
-    MCP_rts(0);  
+    MCP_rts(1);  
+
+
     return true;
 }
 

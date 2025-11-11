@@ -274,7 +274,7 @@ int main(void)
 
 
 
-    printf_P(PSTR("XMEM init done\n\r"));
+    //printf_P(PSTR("XMEM init done\n\r"));
     //test_uart();
 
     // TEST D LATCH
