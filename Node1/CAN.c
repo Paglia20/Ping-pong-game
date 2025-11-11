@@ -152,8 +152,8 @@ ISR(INT1_vect)
         }
     }
 
-    if (flags & MCP_TX0IF) {
-        MCP_clear_interrupt_flags(MCP_TX0IF);
+    if (flags & MCP_TX1IF) {
+        MCP_clear_interrupt_flags(MCP_TX1IF);
         // printf transmission complete 
     }
 }
