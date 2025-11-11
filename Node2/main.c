@@ -13,13 +13,18 @@
 volatile uint32_t ball_count;
 volatile uint32_t prev_count;
 volatile uint8_t  ir_enable;    
+volatile uint8_t solenoid_enable;
 
 
 const char* direction_str[] = {
     "UP", "DOWN", "LEFT", "RIGHT", "NEUTRAL"
 };
 
-
+static inline void pb25_pulse(void){
+    PIOB -> PIO_CODR  = PIO_PB25; //set high
+    for (volatile uint32_t i = 0; i < 400000; i++); //delay
+    PIOB -> PIO_SODR  = PIO_PB25; //set low
+}
 
 
 int main()
@@ -58,6 +63,13 @@ int main()
     PIOC->PIO_PER = (1u << 23);    
     PIOC->PIO_OER = (1u << 23);    
 
+    // PB25
+    PMC -> PMC_PCER0 |= (1 << ID_PIOB);
+    PIOB -> PIO_PER   = PIO_PB25;    // Enable
+    PIOB -> PIO_OER   = PIO_PB25;    // Output
+    PIOB -> PIO_SODR  = PIO_PB25;
+
+
     
     uart_init(F_CPU, 115200);
 
@@ -95,6 +107,7 @@ int main()
     CAN_MESSAGE rx_msg;
 
     ir_enable = 1;
+    solenoid_enable = 1;
 
     encode_init();
     control_timer_init(); 
@@ -113,10 +126,10 @@ int main()
 
 
         if (can_receive(&rx_msg, 0) == 0) {
-            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
-            const char* val = print_dir(rx_msg.data[0]);
-            printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
-            printf("\n\r");
+            // printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
+            // const char* val = print_dir(rx_msg.data[0]);
+            // printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
+            // printf("\n\r");
 
             if (rx_msg.id == 0x100) {
                     ball_count = 0;
@@ -124,6 +137,15 @@ int main()
                     ir_enable = 1;
             } else if (rx_msg.id != 0x111) {
                 continue;   // ignore other messages
+            }
+
+            if (rx_msg.data[3] == 1 && solenoid_enable == 1) {
+                pb25_pulse();
+                solenoid_enable = 0;
+            }
+
+            if (rx_msg.data[3] == 0 && solenoid_enable == 0) {
+                solenoid_enable = 1;
             }
 
             Direction dir = decode_dir(rx_msg.data[0]);

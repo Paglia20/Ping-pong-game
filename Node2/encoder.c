@@ -59,14 +59,14 @@ void encode_init(void) {
     //motor to right
     printf("cal right \n\r");
     motor_write(0, 0, 15000); //right movement
-    time_spinFor(msecs(2000));
+    time_spinFor(msecs(1400));
     right_limit = qdec_tc2_get_position();
 
 
     printf("cal left \n\r");
 
     motor_write(0, 1, 15000); //left movement
-    time_spinFor(msecs(2000));
+    time_spinFor(msecs(1400));
     left_limit = qdec_tc2_get_position();
 
     int32_t pos = qdec_tc2_get_position();
@@ -153,7 +153,7 @@ void update_motor(void) {
     if (duty > 20000) duty = 20000;      // saturate
     if (duty < 0) duty = 0;
 
-    printf("i: %f\r\n", I);
+    //printf("i: %f\r\n", I);
 
     motor_write(0, dir, duty);
 }
