@@ -11,7 +11,7 @@ static int32_t MAX_COUNTS  = 0;
 static volatile int32_t latest_setpoint = 0;   // written from CAN thread, read in ISR
 
 // PI gains & timing
-static const float Kp = 10.0f;
+static const float Kp = 8.0f;
 static const float Ki = 1.0f;
 static const float Ts = 0.020f;                // 20 ms
 static float I = 0.0f;                     // integral accumulator
@@ -110,7 +110,7 @@ void encode_init(void) {
 
     // usable travel with 5% margin
     int32_t max_mag = (abs(left_limit) < abs(right_limit)) ? abs(left_limit) : abs(right_limit);
-    MAX_COUNTS = (int32_t)(0.95f * max_mag);
+    MAX_COUNTS = (int32_t)(0.98f * max_mag);
     // start at center
     latest_setpoint = 0;
     I = 0.0f;
@@ -123,7 +123,7 @@ void set_point(int8_t dir_x) {
     if (dir_x < -100) dir_x = -100;
 
     int32_t sp = (int32_t)((dir_x / 100.0f) * MAX_COUNTS);
-    latest_setpoint = sp;   // the 20ms control task will read this
+    latest_setpoint = -sp;   // the 20ms control task will read this
 
     // printf("Setpoint updated to %ld for dir_x %d\n\r", sp, dir_x);
 }

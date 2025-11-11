@@ -272,8 +272,10 @@ int main(void)
     UART_init(F_CPU, BAUD); // 9600 8N1
     XMEM_init();
 
-    // printf_P(PSTR("XMEM init done\n\r"));
-    // test_uart();
+
+
+    printf_P(PSTR("XMEM init done\n\r"));
+    //test_uart();
 
     // TEST D LATCH
     // test_dlatch();

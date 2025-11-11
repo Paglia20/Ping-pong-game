@@ -143,6 +143,6 @@ void update_joystick(void){
 
     joystick.dir = dir_from_xy(joystick.x_val_perc, joystick.y_val_perc);
 
-	//printf_P(PSTR("updated position\r\n"));
+	//printf_P(PSTR("updated position X: %d Y: %d\r\n"), joystick.x_val, joystick.y_val);
 	
 }

@@ -126,10 +126,10 @@ int main()
 
 
         if (can_receive(&rx_msg, 0) == 0) {
-            // printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
-            // const char* val = print_dir(rx_msg.data[0]);
-            // printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
-            // printf("\n\r");
+            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
+            const char* val = print_dir(rx_msg.data[0]);
+            printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
+            printf("\n\r");
 
             if (rx_msg.id == 0x100) {
                     ball_count = 0;
