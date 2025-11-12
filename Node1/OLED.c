@@ -214,7 +214,7 @@ void oled_play(void){
     oled_newline();
     oled_print("LIFES: "); 
     if (life){
-    oled_print("<3"); 
+    oled_print("~"); 
     }
 
 
