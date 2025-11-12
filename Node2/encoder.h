@@ -3,7 +3,7 @@
 #include "sam/sam3x/include/sam.h"
 
 #include "uart.h"
-#include "can_controller.h"
+#include "can.h"
 #include "../include/joystick.h"
 #include "interrupt.h"
 #include "time.h"

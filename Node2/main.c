@@ -98,13 +98,19 @@ int main()
      */
 
     
-    can_init_def_tx_rx_mb(reg);
+    //can_init_def_tx_rx_mb(reg);
+
+    CanInit init = {
+        .reg = reg
+    };
+    
+    can_init(init, 0);
 
     printf("CAN initialized.\n\r");
 
     ir_adc_init();
 
-    CAN_MESSAGE rx_msg;
+    CanMsg rx_msg;
 
     ir_enable = 1;
     solenoid_enable = 1;
@@ -131,19 +137,19 @@ int main()
             //stop motors
             ir_enable = 0;
 
-            CAN_MESSAGE tx = {
+            CanMsg tx = {
                 .id  = 0x03,
-                .data_length = 1,
-                .data = {0x01}
+                .length = 1,
+                .byte = {0x01}
             };
 
-            can_send(&tx, 0);
+            can_tx(tx);
 
         } 
-        else if (can_receive(&rx_msg, 0) == 0) {
-            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
-            const char* val = print_dir(rx_msg.data[0]);
-            printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
+        else if (can_rx(&rx_msg) == 1) {
+            printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.length);
+            const char* val = print_dir(rx_msg.byte[0]);
+            printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.byte[1], (int8_t) rx_msg.byte[2], rx_msg.byte[3]);
             printf("\n\r");
 
             if (rx_msg.id == 0x100) {
@@ -154,23 +160,23 @@ int main()
                 continue;   // ignore other messages
             }
 
-            if (rx_msg.data[3] == 1 && solenoid_enable == 1) {
+            if (rx_msg.byte[3] == 1 && solenoid_enable == 1) {
                 pb25_pulse();
                 solenoid_enable = 0;
             }
 
-            if (rx_msg.data[3] == 0 && solenoid_enable == 0) {
+            if (rx_msg.byte[3] == 0 && solenoid_enable == 0) {
                 solenoid_enable = 1;
             }
 
-            Direction dir = decode_dir(rx_msg.data[0]);
+            Direction dir = decode_dir(rx_msg.byte[0]);
             switch (dir) {
                 case UP:    servo_write(1, 1000); break;  // 0°
                 case DOWN:  servo_write(1, 2000); break;  // 180°
                 //case NEUTRAL: servo_write(1, 1500); break;  // 90°
                 default:    {
                     servo_write(1, 1500);
-                    set_point((int8_t) rx_msg.data[1]);
+                    set_point((int8_t) rx_msg.byte[1]);
                 
                 } break; 
             }

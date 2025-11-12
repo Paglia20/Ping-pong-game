@@ -11,8 +11,6 @@ SOURCE_FILES = \
 	uart.c \
 	time.c \
 	can.c \
-	can_interrupt.c \
-	can_controller.c \
 	interrupt.c \
 	encoder.c
 	
