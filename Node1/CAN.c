@@ -76,14 +76,14 @@ void CAN_init_normal_16TQ(void)
     MCP_write(MCP_CNF2, BTLMODE | SAMPLE_3X | (6<<3) | 1);
     MCP_write(MCP_CNF3, WAKFIL_DISABLE | 5);
 
-    MCP_write(MCP_RXB0CTRL, 0x60);
+    //MCP_write(MCP_RXB0CTRL, 0x60);
 
 
 
     MCP_clear_interrupt_flags(0xFF);
-    //MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);
+    MCP_enable_interrupts(MCP_RX_INT | MCP_TX_INT);
 
-    MCP_enable_interrupts(0x09); // RX0IE | TX1IE
+    //MCP_enable_interrupts(0x09); // RX0IE | TX1IE
     MCP_clear_interrupt_flags(0xFF);
 
     MCP_set_mode(MODE_NORMAL);
@@ -97,16 +97,16 @@ bool CAN_send(const CanFrame* f)
     uint8_t sidh, sidl;
     id_to_regs(f->id, &sidh, &sidl);
 
-    MCP_write(TXB1SIDH, sidh);
-    MCP_write(TXB1SIDL, sidl);
-    MCP_write(TXB1DLC,  f->dlc & 0x0F);
+    MCP_write(TXB0SIDH, sidh);
+    MCP_write(TXB0SIDL, sidl);
+    MCP_write(TXB0DLC,  f->dlc & 0x0F);
 
     for (uint8_t i = 0; i < f->dlc; i++) {
-        MCP_write((uint8_t)(TXB1D0 + i), f->data[i]);
+        MCP_write((uint8_t)(TXB0D0 + i), f->data[i]);
     }
     
     //require transm
-    MCP_rts(1);  
+    MCP_rts(0);  
 
 
     return true;
@@ -160,6 +160,6 @@ ISR(INT1_vect)
 
     if (flags & MCP_TX1IF) {
         MCP_clear_interrupt_flags(MCP_TX1IF);
-        // printf transmission complete 
+        printf("transmission complete");
     }
 }

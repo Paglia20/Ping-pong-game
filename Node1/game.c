@@ -45,7 +45,7 @@ void start_game(void){
 
 
         if (CAN_receive(&rx)) {
-            if (rx.id == 0x01 && rx.dlc == 1 && rx.data[0] == 0x01) {
+            if (rx.id == 0x03 && rx.dlc == 1 && rx.data[0] == 0x01) {
                 printf("Goal scored! Exiting game loop.\n\r");
                 run_menu = 1;
             }

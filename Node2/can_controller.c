@@ -26,7 +26,7 @@
  */
 uint8_t can_init_def_tx_rx_mb(uint32_t can_br)
 {
-	return can_init(can_br, 1, 2);
+	return can_init(can_br, 1, 1);
 }
 
 /**
@@ -87,10 +87,10 @@ uint8_t can_init(uint32_t can_br, uint8_t num_tx_mb, uint8_t num_rx_mb)
 	uint32_t can_ier = 0;
 
 	/* Configure receive mailboxes */
-	for (int n = num_tx_mb; n <= num_rx_mb + num_tx_mb; n++)  //Simply one mailbox setup for all messages. You might want to apply filter for them.
+	for (int n = num_tx_mb; n < num_rx_mb + num_tx_mb; n++)  //Simply one mailbox setup for all messages. You might want to apply filter for them.
 	{
-		CAN0->CAN_MB[n].CAN_MAM = 0; //Accept all messages
-		CAN0->CAN_MB[n].CAN_MID = CAN_MID_MIDE;
+		CAN0->CAN_MB[n].CAN_MAM = 0; //Accept all messagescan_interrupt
+		CAN0->CAN_MB[n].CAN_MID = 0;
 		CAN0->CAN_MB[n].CAN_MMR = (CAN_MMR_MOT_MB_RX);
 		CAN0->CAN_MB[n].CAN_MCR |= CAN_MCR_MTCR;
 
@@ -100,7 +100,7 @@ uint8_t can_init(uint32_t can_br, uint8_t num_tx_mb, uint8_t num_rx_mb)
 	/*Configure transmit mailboxes */
 	for (int n = 0; n < num_tx_mb; n++)
 	{
-		CAN0->CAN_MB[n].CAN_MID = CAN_MID_MIDE;
+		CAN0->CAN_MB[n].CAN_MID = 0;
 		CAN0->CAN_MB[n].CAN_MMR = (CAN_MMR_MOT_MB_TX);
 	}
 	

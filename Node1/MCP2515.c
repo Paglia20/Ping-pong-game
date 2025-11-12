@@ -70,6 +70,8 @@ void MCP_bit_modify(uint8_t addr, uint8_t mask, uint8_t data) {
 }
 
 void MCP_rts(uint8_t buffer_index) {
+    //printf("attempted to send %x", MCP_RTS_BASE | (1 << buffer_index));
+
     if (buffer_index > 2) return;       //TX0, TX1, TX2
     cs_low();
     SPI_txrx(MCP_RTS_BASE | (1 << buffer_index)); 

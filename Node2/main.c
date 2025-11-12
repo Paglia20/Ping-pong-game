@@ -124,8 +124,23 @@ int main()
             motor_write(0, 2, 0); 
         }
 
+        if ((ball_count > prev_count) && (ir_enable == 1)) {
+            printf("GOL! score: %d\n\r", ball_count);
+            prev_count = ball_count;
 
-        if (can_receive(&rx_msg, 1) == 0) {
+            //stop motors
+            ir_enable = 0;
+
+            CAN_MESSAGE tx = {
+                .id  = 0x03,
+                .data_length = 1,
+                .data = {0x01}
+            };
+
+            can_send(&tx, 0);
+
+        } 
+        else if (can_receive(&rx_msg, 0) == 0) {
             printf("RX ID=0x%03X LEN=%d DATA (direction):", rx_msg.id, rx_msg.data_length);
             const char* val = print_dir(rx_msg.data[0]);
             printf(" %s , X: %d, Y: %d, button : %d", val, (int8_t) rx_msg.data[1], (int8_t) rx_msg.data[2], rx_msg.data[3]);
@@ -162,22 +177,7 @@ int main()
 
         }
 
-        if ((ball_count > prev_count) && (ir_enable == 1)) {
-            printf("GOL! score: %d\n\r", ball_count);
-            prev_count = ball_count;
-
-            //stop motors
-            ir_enable = 0;
-
-            CAN_MESSAGE tx = {
-                .id  = 0x01,
-                .data_length = 1,
-                .data = {0x01}
-            };
-
-            can_send(&tx, 0);
-
-        }
+        
     }
 
 }

@@ -5,10 +5,10 @@
 
 
 // ---- Indirizzi che ci servono (coerenti con la mappa MCP2515) ----
-#define TXB1SIDH  0x41
-#define TXB1SIDL  0x42
-#define TXB1DLC   0x45
-#define TXB1D0    0x46
+#define TXB0SIDH  0x31
+#define TXB0SIDL  0x32
+#define TXB0DLC   0x35
+#define TXB0D0    0x36
 
 #define RXB0SIDH  MCP_RXB0SIDH   
 #define RXB0SIDL  (MCP_RXB0SIDH+1)
