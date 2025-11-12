@@ -210,11 +210,17 @@ void oled_clear(void){
 void oled_play(void){
     cs_low();
     //todo
-    oled_print("Playing...");
+    if (life){
+        oled_print("Playing...");
+    } else {
+        oled_print("Game Over...");
+
+    }
+
     oled_newline();
     oled_print("LIFES: "); 
     if (life){
-    oled_print("~"); 
+        oled_print("~"); 
     }
 
 
