@@ -1,7 +1,13 @@
 #include "../include/game.h"
 
+
+extern volatile u_int8_t lifes;
+extern volatile char score[50];
+
 void start_game(void){
     run_menu = 0;
+    lifes = 0;
+    float fscore = 0;
     oled_clear();
 
     calibrate();
@@ -26,6 +32,7 @@ void start_game(void){
     {
         update_joystick();
         //update_slider();
+        oled_play();
 
 
         uint8_t dir = encode_direction(joystick.dir);
@@ -43,11 +50,15 @@ void start_game(void){
 
         _delay_ms(100);
 
+        fscore += 0.1;
+        
+        sprintf(score, "%.2f", fscore); 
+
 
         if (CAN_receive(&rx)) {
             if (rx.id == 0x03 && rx.dlc == 1 && rx.data[0] == 0x01) {
-                printf("Goal scored! Exiting game loop.\n\r");
-                run_menu = 1;
+                printf("Goal scored!\n\r");
+                lifes++;
             }
         }
     }

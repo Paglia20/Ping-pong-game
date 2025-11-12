@@ -2,6 +2,7 @@
 #include "../include/OLED.h"
 #include "../include/SPI.h"
 #include "../include/fonts.h"
+#include "../include/game.h"
 
 #define FONT_WIDTH 4
 #define FONT_SPACING 1   // one blank column between chars
@@ -202,6 +203,27 @@ void oled_clear(void){
             SPI_txrx(0x00);
         }
     }
+    cs_high();
+    oled_home();
+}
+
+void oled_play(void){
+    cs_low();
+    //todo
+    oled_print("Playing...");
+    oled_newline();
+    oled_print("LIFES: "); 
+    for (size_t i = 0; i < lifes; i++)
+    {
+        oled_print("<3"); 
+    }
+
+
+    oled_newline();
+    oled_print("SCORE: "); 
+    oled_print("0"); //score variable to be added
+
+
     cs_high();
     oled_home();
 }

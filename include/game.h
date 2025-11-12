@@ -20,4 +20,7 @@
 #include "../include/MCP2515.h"
 #include <avr/interrupt.h>
 
+extern volatile u_int8_t lifes;
+extern volatile char score[50];
+
 void start_game(void);

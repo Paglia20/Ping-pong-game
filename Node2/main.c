@@ -135,7 +135,10 @@ int main()
             prev_count = ball_count;
 
             //stop motors
-            ir_enable = 0;
+            if (ball_count == 3) {
+                ir_enable = 0;            
+            }
+            
 
             CanMsg tx = {
                 .id  = 0x03,
