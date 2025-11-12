@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+
 typedef struct BoardButtons {
 
     uint8_t R1:1;

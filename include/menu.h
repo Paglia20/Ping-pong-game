@@ -4,9 +4,20 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "../include/OLED.h"
+#include "../include/SPI.h"
+#include "../include/menu.h"
+#include "../include/joystick.h"  
+#include "../include/cursor.h"
+#include "../include/board.h"
+#include "../include/game.h"
+#include <util/delay.h>
+#include <stdio.h> 
+
 #define MENU_STR_LEN 20
 
 extern int run_menu;
+extern BoardButtons board;
 
 typedef void (*MenuAction)(void);
 

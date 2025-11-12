@@ -158,7 +158,8 @@ int main()
                     ball_count = 0;
                     prev_count = 0;
                     ir_enable = 1;
-            } else if (rx_msg.id != 0x111) {
+            }
+            else if ((rx_msg.id != 0x111)) {
                 continue;   // ignore other messages
             }
 

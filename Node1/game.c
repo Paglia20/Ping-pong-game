@@ -26,7 +26,7 @@ void start_game(void){
     _delay_ms(100);
 
     CanFrame rx;
-
+    
     while (!run_menu)
     {
         update_joystick();
@@ -61,7 +61,16 @@ void start_game(void){
             }
         } else {
             iscore += 1;
-
         }
+        
+        if (board_read_buttons(&board)) {
+            if (board_buttons_any(&board)) {
+                if (board.R6) {
+                    run_menu = 1;
+                    menu_init();
+                }
+            }
+        }
+        
     }
 }

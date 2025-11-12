@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 
+#include "../include/CAN.h"
 #include "../include/ADC.h"
 #include "../include/UART.h"
-#include "../include/bit_macros.h"
 #include "../include/joystick.h"
 
 #define DEADZONE 20   
@@ -104,6 +104,7 @@ void calibrate(void) {
     joystick.x_zero = x;
     joystick.y_zero = y;
     print_zeros();
+
 }
 
 

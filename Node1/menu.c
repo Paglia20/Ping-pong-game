@@ -1,12 +1,5 @@
-#include "../include/OLED.h"
-#include "../include/SPI.h"
 #include "../include/menu.h"
-#include "../include/joystick.h"  
-#include "../include/cursor.h"
-#include "../include/board.h"
-#include "../include/game.h"
-#include <util/delay.h>
-#include <stdio.h> 
+
 
 int run_menu = 1;
 BoardButtons board;
@@ -24,7 +17,6 @@ static uint8_t selectedIndex = 0;
 
 
 MenuItem submenu_items[3] = {
-    {true, "Calibrate", NULL, calibrate},
     {true, "Test AVR", NULL, test_avr},
     {true, "Back",       NULL, back_action}
 };

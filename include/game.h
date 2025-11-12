@@ -16,6 +16,8 @@
 #include "../include/OLED.h"
 #include "../include/cursor.h"
 #include "../include/menu.h"
+#include "../include/board.h"
+
 #include "../include/CAN.h"
 #include "../include/MCP2515.h"
 #include <avr/interrupt.h>
