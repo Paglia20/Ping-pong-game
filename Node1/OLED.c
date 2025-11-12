@@ -213,15 +213,14 @@ void oled_play(void){
     oled_print("Playing...");
     oled_newline();
     oled_print("LIFES: "); 
-    for (size_t i = 0; i < lifes; i++)
-    {
-        oled_print("<3"); 
+    if (life){
+    oled_print("<3"); 
     }
 
 
     oled_newline();
     oled_print("SCORE: "); 
-    oled_print("0"); //score variable to be added
+    oled_print(score);
 
 
     cs_high();

@@ -1,13 +1,12 @@
 #include "../include/game.h"
 
-
-extern volatile u_int8_t lifes;
-extern volatile char score[50];
+volatile bool life;
+volatile char score[50];
 
 void start_game(void){
     run_menu = 0;
-    lifes = 0;
-    float fscore = 0;
+    life = 1;
+    int iscore = 0;
     oled_clear();
 
     calibrate();
@@ -50,16 +49,19 @@ void start_game(void){
 
         _delay_ms(100);
 
-        fscore += 0.1;
         
-        sprintf(score, "%.2f", fscore); 
+        sprintf(score, "%10d", iscore); 
 
 
         if (CAN_receive(&rx)) {
-            if (rx.id == 0x03 && rx.dlc == 1 && rx.data[0] == 0x01) {
+            if ((rx.id == 0x03 && rx.dlc == 1 && rx.data[0] == 0x01) && life) {
                 printf("Goal scored!\n\r");
-                lifes++;
+                life = 0;
+                oled_clear();
             }
+        } else {
+            iscore += 1;
+
         }
     }
 }

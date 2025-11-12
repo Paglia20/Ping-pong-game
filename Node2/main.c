@@ -135,16 +135,15 @@ int main()
             prev_count = ball_count;
 
             //stop motors
-            if (ball_count == 3) {
-                ir_enable = 0;            
-            }
-            
+            ir_enable = 0;            
 
             CanMsg tx = {
                 .id  = 0x03,
                 .length = 1,
                 .byte = {0x01}
             };
+
+            printf("sending finish");
 
             can_tx(tx);
 

@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <avr/pgmspace.h>
 
+#include "../include/game.h"
+
 void oled_write_cmd1(uint8_t c);
 void oled_write_cmd2(uint8_t c, uint8_t a0);
 void oled_write_cmd3(uint8_t c, uint8_t a0, uint8_t a1);
