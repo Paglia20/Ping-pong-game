@@ -10,7 +10,7 @@ The goal of the project is to design, implement, and integrate hardware and soft
 
 The system is built around two cooperating embedded nodes that communicate over a **CAN bus**.  
 
-![Final](images/final.mp4)
+
 ---
 
 ## System Architecture
