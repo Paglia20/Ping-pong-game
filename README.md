@@ -4,14 +4,14 @@ This repository contains the implementation of a **distributed embedded control 
 
 The goal of the project is to design, implement, and integrate hardware and software components to realize a fully functional electromechanical ping-pong game.
 
----
+
 
 ## Project Overview
 
 The system is built around two cooperating embedded nodes that communicate over a **CAN bus**.  
 
 
----
+
 
 ## System Architecture
 
@@ -68,7 +68,6 @@ The system is built around two cooperating embedded nodes that communicate over 
 
 The codebase follows a **modular driver-based design**, where each hardware component has its own driver.
 
----
 
 ## Build and Flashing
 
