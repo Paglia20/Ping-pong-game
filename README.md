@@ -62,12 +62,6 @@ The system is built around two cooperating embedded nodes that communicate over 
   - Layered CAN driver
   - Hardware-independent message abstraction
 
----
-
-## Software Structure
-
-The codebase follows a **modular driver-based design**, where each hardware component has its own driver.
-
 
 ## Build and Flashing
 
