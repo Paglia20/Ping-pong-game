@@ -83,13 +83,45 @@ make flash
 make flash
 ```
 
+
+##  PID controller:
+The motor control system in Node 2 is implemented as a closed-loop control system, where the motor position measured by the encoder is continuously compared to a reference value received from Node 1. The goal is to minimize the error between the desired and the actual position.
+At each control step:
+The encoder provides the current motor position.
+The position error is computed.
+A control law updates the motor command accordingly.
+This control loop is executed periodically inside a timer interrupt (TC0_Handler), ensuring a fixed and deterministic control period.
+The system uses a discrete time integration approach, based on the Euler method, to update the motor state over time. In practice, the continuous motor dynamics are approximated by updating the control output using small time steps and integral error accumulation.
+
+
+
 ## Development Notes
 
 - Node 1 operates at **5V logic**, Node 2 at **3.3V logic**  
   → Level shifting is required.
 - External memory, SPI, and CAN buses were verified using oscilloscope measurements.
-- The project emphasizes:
-  - Deterministic timing
-  - Noise-robust hardware design
-  - Clear software modularization
+
+| Component | Node | Purpose / Function | Reference Manual |
+|----------|------|--------------------|------------------|
+| ATmega162 | Node 1 | Main controller for game logic, user input, display control, ADC handling, and CAN communication | ATmega162 datasheet |
+| ATSAM3X8E (Arduino Due) | Node 2 | Motor control, PWM generation, encoder decoding, solenoid control, closed-loop control | SAM3X datasheet |
+| ATmega16U2 | Node 2 | USB-to-serial interface for programming and debugging | Arduino Due documentation |
+| MCP2515 | Node 1 | Implements CAN 2.0B protocol, message handling via SPI | MCP2515 datasheet |
+| MCP2551 | Node 1 & 2 | Converts logic-level CAN signals to differential CAN bus signals | MCP2551 datasheet |
+| MAX233 | Node 1 | Enables serial communication with a PC for debugging | MAX233 datasheet |
+| MAX156 (8/4-channel) | Node 1 | Converts analog joystick and touch sensor signals to digital values | MAX156 datasheet |
+| SRAM | Node 1 | Stores external data such as display buffers | SRAM datasheet |
+| SSD1309 OLED | Node 1 | Drives the 128×64 OLED display | SSD1309 datasheet |
+| OLED 128×64 | Node 1 | Visual output for game state and information | OLED module manual |
+| Joystick | Node 1 | Analog directional user input | Joystick module |
+| Buttons / Touch sensors | Node 1 | Additional user interaction inputs | I/O board documentation |
+| A3959 | Node 2 | Drives DC motor using PWM and direction control | A3959 datasheet |
+| DC Motor | Node 2 | Moves the racket | Motor datasheet |
+| Quadrature Encoder | Node 2 | Provides motor position and direction feedback | SAM3X TC |
+| Servo Motor | Node 2 | Controls mechanical inclination using PWM | RC servo standard |
+| Solenoid | Node 2 | Shoots the ping-pong ball | Solenoid datasheet |
+| IR Sensor + Op-Amp | Node 2 | Detects goal events via beam interruption | Sensor documentation |
+| Voltage Regulator | Node 1 | Generates stable 5 V supply | Regulator datasheet |
+
+
 
