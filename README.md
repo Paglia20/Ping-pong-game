@@ -5,6 +5,7 @@ This repository contains the implementation of a **distributed embedded control 
 The goal of the project is to design, implement, and integrate hardware and software components to realize a fully functional electromechanical ping-pong game.
 
 VIDEO YT: https://youtu.be/EY5c8nqkt5o
+
 PRESENTAZIONE: https://docs.google.com/presentation/d/1GyrgBDQB6DLBOCSSR9prwrPOCyiLYu961ucq15aZPro/edit?usp=sharing
 
 
